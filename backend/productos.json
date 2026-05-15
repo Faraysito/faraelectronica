@@ -1,0 +1,194 @@
+[
+{
+  "model": "productos.producto",
+  "pk": 7,
+  "fields": {
+    "nombre": "camara 1",
+    "precio": 1000,
+    "descripcion": "es la camara 1",
+    "descripcion_larga": "es la camara uno",
+    "imagen_principal": "media/productos/D_Q_NP_2X_684912-MLA99477555778_112025-R_twv5s5",
+    "categoria": "camaras",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 8,
+  "fields": {
+    "nombre": "camara 2",
+    "precio": 2000,
+    "descripcion": "es la camara 2",
+    "descripcion_larga": "es la camara dos",
+    "imagen_principal": "media/productos/D_Q_NP_889619-MLU79090564640_092024-F_asqnk1",
+    "categoria": "camaras",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 9,
+  "fields": {
+    "nombre": "camara 3",
+    "precio": 3000,
+    "descripcion": "es la camara 3",
+    "descripcion_larga": "es la camara tres",
+    "imagen_principal": "media/productos/D_Q_NP_658735-MLA106587939723_022026-F_u90bmg",
+    "categoria": "camaras",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 10,
+  "fields": {
+    "nombre": "calefactor 1",
+    "precio": 1000,
+    "descripcion": "es el calefactor 1",
+    "descripcion_larga": "es el calefactor uno",
+    "imagen_principal": "media/productos/D_Q_NP_617913-MLA92055130605_092025-R_ymjnen",
+    "categoria": "calefaccion",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 11,
+  "fields": {
+    "nombre": "calefactor 2",
+    "precio": 2000,
+    "descripcion": "es el calefactor 2",
+    "descripcion_larga": "es el calefactor dos",
+    "imagen_principal": "media/productos/D_Q_NP_941313-MLA84549960972_052025-F_ybf9u4",
+    "categoria": "calefaccion",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 12,
+  "fields": {
+    "nombre": "calefactor 3",
+    "precio": 3000,
+    "descripcion": "es el calefactor 3",
+    "descripcion_larga": "es el calefactor tres",
+    "imagen_principal": "media/productos/D_Q_NP_685957-MLA92021783197_092025-F_igcaf5",
+    "categoria": "calefaccion",
+    "created_at": "2026-04-05T05:51:03.700Z",
+    "updated_at": "2026-04-05T05:51:03.709Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 1,
+  "fields": {
+    "producto": 7,
+    "imagen": "media/productos/galeria/D_Q_NP_645064-MLA92329229892_092025-R_jsw18j",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 2,
+  "fields": {
+    "producto": 7,
+    "imagen": "media/productos/galeria/D_Q_NP_645064-MLA92329229892_092025-R_yiofyw",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 3,
+  "fields": {
+    "producto": 8,
+    "imagen": "media/productos/galeria/D_Q_NP_924526-MLA99467656972_112025-F_klwjxk",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 4,
+  "fields": {
+    "producto": 8,
+    "imagen": "media/productos/galeria/D_Q_NP_945354-MLA107081355158_022026-F_s4sex8",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 5,
+  "fields": {
+    "producto": 9,
+    "imagen": "media/productos/galeria/D_Q_NP_658735-MLA106587939723_022026-F_g29qaj",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 6,
+  "fields": {
+    "producto": 9,
+    "imagen": "media/productos/galeria/D_Q_NP_658735-MLA106587939723_022026-F_fnszjf",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 7,
+  "fields": {
+    "producto": 10,
+    "imagen": "media/productos/galeria/D_Q_NP_756446-MLA91655295538_092025-R_fab4l0",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 8,
+  "fields": {
+    "producto": 10,
+    "imagen": "media/productos/galeria/D_Q_NP_932164-MLA92055199421_092025-R_uwtk8l",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 9,
+  "fields": {
+    "producto": 11,
+    "imagen": "media/productos/galeria/D_Q_NP_980013-MLA99932713899_112025-F_ybcxb8",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 10,
+  "fields": {
+    "producto": 11,
+    "imagen": "media/productos/galeria/D_Q_NP_995365-MLA84549961026_052025-F_jpoc5o",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 11,
+  "fields": {
+    "producto": 12,
+    "imagen": "media/productos/galeria/D_Q_NP_818759-MLA92021713561_092025-F_ib3wsm",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+},
+{
+  "model": "productos.productoimagen",
+  "pk": 12,
+  "fields": {
+    "producto": 12,
+    "imagen": "media/productos/galeria/D_Q_NP_951477-MLA99484853742_112025-F_jnwzxl",
+    "created_at": "2026-04-05T05:51:03.711Z"
+  }
+}
+]

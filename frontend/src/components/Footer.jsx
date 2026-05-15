@@ -62,7 +62,9 @@ function Footer() {
           >
             <img src={qr} alt="QR LinkedIn" className="footer-qr" />
           </a>
-          <span className="footer-qr-label">Pincha el QR para llevarte a mi linkedin</span>
+          <span className="footer-qr-label">
+            Pincha el QR para llevarte a mi linkedin
+          </span>
         </div>
       </footer>
     </>

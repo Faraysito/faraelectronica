@@ -1,0 +1,1 @@
+Pon aqui tu logo.png (opcional) y descomenta la linea del img en base_site.html

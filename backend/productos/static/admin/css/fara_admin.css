@@ -1,0 +1,358 @@
+/* ============================================
+   FARA ELECTRÓNICA — Tema Admin
+   Replica el diseño de la página principal:
+   negro #0a0a0a + amarillo #f5c800
+   Fuentes: Bebas Neue (títulos) + DM Sans (texto)
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --fara-negro: #0a0a0a;
+  --fara-negro-2: #111;
+  --fara-negro-3: #1a1a1a;
+  --fara-borde: #222;
+  --fara-borde-amarillo: #2a2a00;
+  --fara-amarillo: #f5c800;
+  --fara-amarillo-hover: #e6b800;
+  --fara-texto: #f5f5f5;
+  --fara-texto-suave: #aaa;
+  --fara-texto-tenue: #666;
+
+  /* Variables que usa el admin de Django (las sobrescribimos) */
+  --primary: #f5c800;
+  --secondary: #111;
+  --accent: #f5c800;
+  --primary-fg: #0a0a0a;
+  --body-fg: #f5f5f5;
+  --body-bg: #0a0a0a;
+  --body-quiet-color: #aaa;
+  --body-loud-color: #fff;
+  --header-color: #0a0a0a;
+  --header-branding-color: #0a0a0a;
+  --header-bg: #f5c800;
+  --header-link-color: #0a0a0a;
+  --breadcrumbs-fg: #0a0a0a;
+  --breadcrumbs-link-fg: #0a0a0a;
+  --breadcrumbs-bg: #1a1a1a;
+  --link-fg: #f5c800;
+  --link-hover-color: #e6b800;
+  --link-selected-fg: #f5c800;
+  --hairline-color: #222;
+  --border-color: #222;
+  --error-fg: #ff6b6b;
+  --message-success-bg: #122312;
+  --message-warning-bg: #2a2a00;
+  --message-error-bg: #2a1212;
+  --darkened-bg: #111;
+  --selected-bg: #1a1a1a;
+  --selected-row: #2a2a00;
+  --button-bg: #f5c800;
+  --button-fg: #0a0a0a;
+  --button-hover-bg: #e6b800;
+  --default-button-bg: #f5c800;
+  --default-button-hover-bg: #e6b800;
+  --close-button-bg: #444;
+  --close-button-hover-bg: #333;
+  --delete-button-bg: #c0392b;
+  --delete-button-hover-bg: #a93226;
+  --object-tools-bg: #f5c800;
+  --object-tools-fg: #0a0a0a;
+  --object-tools-hover-bg: #e6b800;
+  --font-family-primary: 'DM Sans', sans-serif;
+}
+
+/* ---------- Base ---------- */
+body {
+  background: var(--fara-negro) !important;
+  color: var(--fara-texto) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+a:link, a:visited { color: var(--fara-amarillo); }
+a:hover, a:focus { color: var(--fara-amarillo-hover); }
+
+/* ---------- Header ---------- */
+#header {
+  background: var(--fara-amarillo) !important;
+  color: var(--fara-negro) !important;
+  border-bottom: 3px solid var(--fara-negro);
+  padding: 16px 40px;
+}
+
+#branding h1 {
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 2rem !important;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+  color: var(--fara-negro) !important;
+  font-weight: 400;
+}
+
+#user-tools {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--fara-negro) !important;
+  text-transform: none;
+}
+#user-tools a {
+  color: var(--fara-negro) !important;
+  border-bottom: 1px solid rgba(10,10,10,0.4);
+  font-weight: 600;
+}
+#user-tools a:hover { border-bottom-color: var(--fara-negro); }
+
+/* logo opcional dentro del branding */
+.fara-logo {
+  height: 34px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 12px;
+}
+
+/* ---------- Breadcrumbs ---------- */
+div.breadcrumbs {
+  background: var(--fara-negro-3) !important;
+  color: var(--fara-texto-suave) !important;
+  border-bottom: 1px solid var(--fara-borde-amarillo);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  padding: 12px 40px;
+}
+div.breadcrumbs a { color: var(--fara-amarillo); }
+div.breadcrumbs a:hover { color: var(--fara-amarillo-hover); }
+
+/* ---------- Contenedor / módulos ---------- */
+#content { padding: 30px 40px; }
+
+.module {
+  background: var(--fara-negro-2) !important;
+  border: 1px solid var(--fara-borde-amarillo);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.module caption,
+.module h2, .module h3,
+.inline-group h2 {
+  background: var(--fara-negro-3) !important;
+  color: var(--fara-amarillo) !important;
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.15rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--fara-borde-amarillo);
+}
+
+/* línea amarilla superior estilo modal del Home */
+.dashboard #content-main .module {
+  position: relative;
+}
+.dashboard #content-main .module::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fara-amarillo), transparent);
+  z-index: 1;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+  color: var(--fara-texto);
+}
+
+/* ---------- Tablas (listados) ---------- */
+table { color: var(--fara-texto); }
+
+thead th {
+  background: var(--fara-negro-3) !important;
+  color: var(--fara-texto-suave) !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--fara-borde-amarillo) !important;
+}
+thead th a { color: var(--fara-texto-suave) !important; }
+thead th.sorted { color: var(--fara-amarillo) !important; }
+
+#result_list tbody tr { background: var(--fara-negro-2); }
+#result_list tbody tr:nth-child(even) { background: #141414; }
+#result_list tbody tr:hover { background: var(--fara-borde-amarillo) !important; }
+#result_list tbody td, #result_list tbody th {
+  border-bottom: 1px solid #1c1c1c;
+  padding: 12px 10px;
+}
+#result_list tbody a { color: var(--fara-texto); font-weight: 500; }
+#result_list tbody a:hover { color: var(--fara-amarillo); }
+
+/* ---------- Filtros laterales ---------- */
+#changelist-filter {
+  background: var(--fara-negro-2) !important;
+  border: 1px solid var(--fara-borde-amarillo);
+  border-radius: 8px;
+}
+#changelist-filter h2 {
+  background: var(--fara-negro-3) !important;
+  color: var(--fara-amarillo) !important;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+#changelist-filter h3 { color: var(--fara-texto-suave); }
+#changelist-filter li.selected a { color: var(--fara-amarillo); font-weight: 600; }
+#changelist-filter a { color: var(--fara-texto-suave); }
+#changelist-filter a:hover { color: var(--fara-amarillo); }
+
+/* ---------- Formularios ---------- */
+.form-row { border-bottom: 1px solid #1a1a1a; }
+fieldset.module { border: 1px solid var(--fara-borde-amarillo); }
+
+label { color: var(--fara-texto-suave) !important; font-weight: 500; }
+
+input[type=text], input[type=password], input[type=email],
+input[type=url], input[type=number], input[type=tel],
+textarea, select, .vTextField {
+  background: var(--fara-negro) !important;
+  color: var(--fara-texto) !important;
+  border: 1px solid var(--fara-borde) !important;
+  border-radius: 4px !important;
+  padding: 9px 12px !important;
+  font-family: 'DM Sans', sans-serif;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--fara-amarillo) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(245,200,0,0.15) !important;
+}
+
+.help, p.help, .help-tooltip { color: var(--fara-texto-tenue) !important; font-size: 0.78rem; }
+
+/* ---------- Botones ---------- */
+.button, input[type=submit], input[type=button],
+.submit-row input, a.button {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem !important;
+  background: var(--fara-amarillo) !important;
+  color: var(--fara-negro) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 11px 22px !important;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.button:hover, input[type=submit]:hover, .submit-row input:hover, a.button:hover {
+  background: var(--fara-amarillo-hover) !important;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+  background: var(--fara-amarillo) !important;
+  color: var(--fara-negro) !important;
+  font-weight: 700 !important;
+}
+
+/* botones secundarios / cerrar */
+.submit-row a.closelink,
+.button.cancel-link {
+  background: #333 !important;
+  color: var(--fara-texto) !important;
+}
+.submit-row a.closelink:hover { background: #444 !important; }
+
+/* botón eliminar */
+.submit-row a.deletelink, a.deletelink {
+  background: #c0392b !important;
+  color: #fff !important;
+  border-radius: 4px !important;
+  padding: 11px 22px !important;
+}
+.submit-row a.deletelink:hover { background: #a93226 !important; }
+
+.submit-row { background: var(--fara-negro-2); border-top: 1px solid var(--fara-borde-amarillo); border-radius: 0 0 8px 8px; padding: 16px; }
+
+/* object-tools (botón "Añadir") */
+.object-tools a {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--fara-amarillo) !important;
+  color: var(--fara-negro) !important;
+  border-radius: 4px;
+}
+.object-tools a:hover { background: var(--fara-amarillo-hover) !important; }
+.object-tools a.addlink { background: var(--fara-amarillo) !important; }
+
+/* ---------- Paginación ---------- */
+.paginator a:link, .paginator a:visited {
+  background: var(--fara-negro-2);
+  color: var(--fara-amarillo);
+  border: 1px solid var(--fara-borde-amarillo);
+  border-radius: 4px;
+}
+.paginator a:hover { background: var(--fara-borde-amarillo); }
+.paginator .this-page { background: var(--fara-amarillo); color: var(--fara-negro); border-radius: 4px; padding: 2px 8px; font-weight: 700; }
+
+/* ---------- Mensajes ---------- */
+ul.messagelist li {
+  font-family: 'DM Sans', sans-serif;
+  border-radius: 6px;
+  border-left: 3px solid var(--fara-amarillo);
+}
+ul.messagelist li.success { background: var(--message-success-bg); border-left-color: #4caf50; }
+ul.messagelist li.warning { background: var(--message-warning-bg); border-left-color: var(--fara-amarillo); }
+ul.messagelist li.error { background: var(--message-error-bg); border-left-color: #ff6b6b; }
+
+/* ---------- Inlines (galería de imágenes) ---------- */
+.inline-group { border: 1px solid var(--fara-borde-amarillo); border-radius: 8px; background: var(--fara-negro-2); }
+.inline-related h3 { background: var(--fara-negro-3); color: var(--fara-texto-suave); border-bottom: 1px solid #1c1c1c; }
+.inline-related h3 .inline_label { color: var(--fara-amarillo); }
+.add-row a { color: var(--fara-amarillo) !important; font-weight: 600; }
+
+/* ---------- Login ---------- */
+body.login { background: var(--fara-negro) !important; }
+.login #container {
+  background: var(--fara-negro-2) !important;
+  border: 1px solid var(--fara-borde-amarillo);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.login #container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fara-amarillo), transparent);
+}
+.login #header {
+  background: var(--fara-amarillo) !important;
+  border-radius: 0;
+}
+.login #content { padding: 30px; }
+.login .form-row { border: none; }
+.login .submit-row { background: transparent; border: none; padding: 0; }
+.login .submit-row input { width: 100%; padding: 13px !important; }
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--fara-negro); }
+::-webkit-scrollbar-thumb { background: var(--fara-borde-amarillo); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fara-amarillo); }
+
+/* ---------- Selector relacionado / calendario ---------- */
+.calendarbox, .clockbox { background: var(--fara-negro-2) !important; border: 1px solid var(--fara-borde-amarillo) !important; }
+.calendar caption, .calendarbox h2 { background: var(--fara-amarillo) !important; color: var(--fara-negro) !important; }
+.calendar td.selected a { background: var(--fara-amarillo); color: var(--fara-negro); }
+.calendar td a:hover, .timelist a:hover { background: var(--fara-borde-amarillo); }

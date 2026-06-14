@@ -1,0 +1,276 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===== Paquetes =====
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+
+% ===== Colores de marca =====
+\definecolor{faramarillo}{HTML}{E0A200}
+\definecolor{faranegro}{HTML}{0A0A0A}
+\definecolor{faragris}{HTML}{555555}
+
+% ===== Enlaces =====
+\hypersetup{
+  colorlinks=true,
+  linkcolor=faramarillo,
+  urlcolor=faramarillo,
+  citecolor=faramarillo
+}
+
+% ===== Títulos =====
+\titleformat{\section}
+  {\color{faranegro}\Large\bfseries}
+  {\thesection.}{0.5em}{}
+\titleformat{\subsection}
+  {\color{faramarillo}\large\bfseries}
+  {\thesubsection}{0.5em}{}
+
+% ===== Encabezado y pie =====
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{faramarillo}{\textbf{FARA ELECTRÓNICA}}}
+\rhead{Manual de uso}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ===== Caja de nota =====
+\newtcolorbox{nota}{
+  colback=faramarillo!8,
+  colframe=faramarillo,
+  boxrule=0.5pt,
+  arc=3pt,
+  left=8pt,right=8pt,top=6pt,bottom=6pt
+}
+
+\begin{document}
+
+% ===== Portada =====
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+  {\Huge\bfseries\textcolor{faranegro}{FARA ELECTRÓNICA}}\\[0.3cm]
+  {\Large\textcolor{faramarillo}{\rule{6cm}{2pt}}}\\[1cm]
+  {\LARGE Manual de Uso}\\[0.5cm]
+  {\large Tienda en línea: cámaras de seguridad y calefacción}\\[2cm]
+  {\large\textbf{Contenido}}\\[0.3cm]
+  {\large Guía para el cliente \quad$\bullet$\quad Guía para el administrador}\\[3cm]
+  {\large \today}
+  \vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =====================================================
+\section{Introducción}
+% =====================================================
+
+Este documento explica cómo usar la tienda en línea de \textbf{Fara Electrónica},
+tanto desde el punto de vista del \textbf{cliente} (la persona que compra) como del
+\textbf{administrador} (quien gestiona los productos y las ventas).
+
+La plataforma permite:
+\begin{itemize}[leftmargin=*]
+  \item Ver el catálogo de cámaras de seguridad y equipos de calefacción.
+  \item Agregar productos a un carrito de compras.
+  \item Pagar en línea con \textbf{Webpay} (tarjetas de crédito/débito) o contactar
+        directamente al vendedor por \textbf{WhatsApp}.
+  \item Consultar el historial de compras.
+  \item (Administrador) Gestionar productos, precios, stock, ver órdenes y estadísticas
+        de ventas y rentabilidad.
+\end{itemize}
+
+\begin{nota}
+\textbf{Nota:} para pagar con Webpay es necesario iniciar sesión con una cuenta de Google.
+El contacto por WhatsApp no requiere iniciar sesión.
+\end{nota}
+
+% =====================================================
+\section{Guía para el Cliente}
+% =====================================================
+
+\subsection{Iniciar sesión}
+
+\begin{enumerate}[leftmargin=*]
+  \item En la esquina superior de la página, pulsa el botón \textbf{``Iniciar sesión''}.
+  \item Se abrirá una ventana para entrar con tu cuenta de \textbf{Google}.
+  \item Selecciona tu cuenta. Una vez dentro, verás tu nombre y tu foto en la barra superior.
+\end{enumerate}
+
+\begin{nota}
+Iniciar sesión es obligatorio para pagar con Webpay y para ver tu historial de compras.
+\end{nota}
+
+\subsection{Explorar el catálogo}
+
+Desde la página principal puedes entrar a las categorías \textbf{Cámaras de Seguridad}
+o \textbf{Calefacción}. Dentro de cada categoría verás los productos en tarjetas, y podrás
+ordenarlos por precio o por nombre con el menú \textbf{``Ordenar por''}.
+
+Cada tarjeta de producto tiene tres botones:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Detalles:} abre una ventana con las fotos del producto (puedes ampliarlas
+        pasando el cursor por encima), el precio y la descripción completa.
+  \item \textbf{+ Carrito:} agrega el producto al carrito. Si no has iniciado sesión, se te
+        pedirá hacerlo primero.
+  \item \textbf{Comprar:} abre una ventana para comprar ese producto directamente, donde
+        puedes elegir la cantidad y pagar con Webpay o contactar al vendedor.
+\end{itemize}
+
+\begin{nota}
+Si un producto está \textbf{agotado}, aparecerá una etiqueta roja y no se podrá comprar.
+\end{nota}
+
+\subsection{Usar el carrito}
+
+\begin{enumerate}[leftmargin=*]
+  \item Pulsa el ícono del \textbf{carrito} en la barra superior (siempre visible).
+  \item Verás la lista de productos agregados. Puedes aumentar o disminuir la cantidad
+        con los botones \textbf{$+$} y \textbf{$-$}, o quitar un producto con la \textbf{X}.
+  \item Abajo se muestra el \textbf{total} a pagar.
+\end{enumerate}
+
+\subsection{Pagar la compra}
+
+En el carrito (o en la ventana ``Comprar'' de un producto) tienes dos opciones:
+
+\textbf{Opción 1 -- Pagar con Webpay:}
+\begin{enumerate}[leftmargin=*]
+  \item Pulsa \textbf{``Pagar con Webpay''}.
+  \item Serás redirigido al portal seguro de Webpay (Transbank).
+  \item Ingresa los datos de tu tarjeta y confirma el pago.
+  \item Al terminar, volverás a la página y verás si el pago fue exitoso o rechazado.
+\end{enumerate}
+
+\textbf{Opción 2 -- Contactar al vendedor por WhatsApp:}
+\begin{enumerate}[leftmargin=*]
+  \item Pulsa \textbf{``Contactar con vendedor''}.
+  \item Se abrirá WhatsApp con un mensaje ya escrito que incluye los productos y el total.
+  \item Envía el mensaje para coordinar el pago y la entrega directamente con el vendedor.
+\end{enumerate}
+
+\subsection{Ver el historial de compras}
+
+Una vez iniciada la sesión, pulsa el ícono del \textbf{reloj} en la barra superior para
+abrir \textbf{``Mis Compras''}. Ahí verás todas tus órdenes pagadas, con la fecha, los
+productos, el estado (pagada, preparando, entregada, etc.) y el total.
+
+\subsection{Modo claro / oscuro}
+
+En la esquina inferior derecha hay un botón con un \textbf{sol/luna} que permite cambiar
+entre el modo oscuro y el modo claro de la página, según tu preferencia.
+
+% =====================================================
+\section{Guía para el Administrador}
+% =====================================================
+
+\subsection{Acceder al panel}
+
+El panel de administración está en la dirección:
+
+\begin{center}
+\texttt{https://(tu-dominio)/gestion-fara-super-user/}
+\end{center}
+
+Ingresa con tu \textbf{usuario y contraseña} de administrador. Tras iniciar sesión verás
+el \textbf{Dashboard} con un resumen de ventas.
+
+\begin{nota}
+Solo los usuarios administradores pueden entrar a este panel y ver las estadísticas.
+\end{nota}
+
+\subsection{El Dashboard}
+
+Al entrar verás tarjetas con las métricas principales:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Ventas totales:} suma de todas las órdenes pagadas.
+  \item \textbf{Utilidad:} ganancia real (ventas menos los costos de los productos).
+  \item \textbf{Margen:} porcentaje de rentabilidad promedio.
+  \item \textbf{Órdenes:} cantidad de órdenes pagadas.
+\end{itemize}
+Más abajo se muestran los productos \textbf{más vendidos} y \textbf{menos vendidos},
+y accesos directos a Productos, Agregar producto y Órdenes.
+
+\subsection{Gestionar productos}
+
+Entra a \textbf{Productos} desde el menú o el acceso directo. Allí puedes:
+\begin{itemize}[leftmargin=*]
+  \item Ver todos los productos con su precio, costo, margen y stock.
+  \item Editar el \textbf{precio}, el \textbf{costo} y el \textbf{stock} directamente
+        desde la lista.
+  \item Pulsar un producto para editar todos sus datos o subir más fotos.
+  \item Crear uno nuevo con el botón \textbf{``Agregar producto''}.
+\end{itemize}
+
+\begin{nota}
+\textbf{Importante:} el \textbf{costo} es lo que a ti te cuesta el producto. Sirve para
+calcular el margen de ganancia y \textbf{nunca se muestra al cliente}. Si no lo defines,
+el margen aparecerá como 100\,\%.
+\end{nota}
+
+\subsection{Entender el margen y la utilidad}
+
+El sistema calcula automáticamente:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Margen unitario} = precio de venta $-$ costo.
+  \item \textbf{Margen \%} = (precio $-$ costo) $/$ precio $\times$ 100.
+  \item \textbf{Utilidad de una orden} = total cobrado $-$ costo de los productos vendidos.
+\end{itemize}
+En la lista de productos, el margen se muestra con colores: verde (bueno),
+amarillo (medio) y rojo (bajo).
+
+\subsection{Gestionar el stock}
+
+El stock indica cuántas unidades hay disponibles. Cuando llega a \textbf{0}, el producto
+aparece como \textbf{``Agotado''} en la web y no se puede comprar. El stock se descuenta
+automáticamente cuando un cliente paga con Webpay.
+
+\subsection{Gestionar órdenes}
+
+Entra a \textbf{Órdenes} para ver todas las compras. De cada orden puedes ver el cliente,
+el total, la utilidad, el estado y los productos comprados. Puedes cambiar el \textbf{estado}
+de una orden (pendiente, pagada, preparando, entregada, cancelada) para llevar el control
+de las entregas.
+
+\subsection{Agregar una nueva categoría}
+
+Para agregar una categoría nueva de productos se requiere una pequeña modificación en el
+código (en el archivo de modelos del backend) y volver a desplegar. Consulta con quien
+mantiene el sistema para hacerlo de forma segura.
+
+% =====================================================
+\section{Preguntas frecuentes}
+% =====================================================
+
+\textbf{¿Es seguro pagar con Webpay?}\\
+Sí. El pago se procesa en el portal oficial de Transbank; la tienda nunca ve ni guarda
+los datos de tu tarjeta.
+
+\vspace{0.3cm}
+\textbf{¿Puedo comprar sin tarjeta?}\\
+Sí, usando el botón ``Contactar con vendedor'' para coordinar por WhatsApp.
+
+\vspace{0.3cm}
+\textbf{Pagué pero no veo mi orden.}\\
+Revisa ``Mis Compras''. Si el pago se descontó y la orden no aparece, contacta al vendedor
+por WhatsApp con tu comprobante.
+
+\vspace{0.3cm}
+\textbf{(Admin) El margen me sale 100\,\%.}\\
+Es porque el costo del producto está en 0. Edita el producto y define su costo real.
+
+\vspace{1cm}
+\begin{center}
+\textcolor{faragris}{\small Manual de uso -- Fara Electrónica -- \today}
+\end{center}
+
+\end{document}

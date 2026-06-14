@@ -2,68 +2,77 @@
 {% load i18n static %}
 
 {% block content_title %}
-<h1 style="font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.04em; color:#e8eef5; margin-bottom:4px;">
-  Panel de gestion
+<h1 style="font-family:'Bebas Neue',sans-serif; font-size:2.4rem; letter-spacing:0.04em; color:#f5f5f5; margin-bottom:4px;">
+  Dashboard
 </h1>
-<p style="font-family:'DM Sans',sans-serif; color:#5f7a95; font-size:0.9rem; margin-top:0;">
-  Fara Electronica - administracion de productos, ordenes y estadisticas.
+<p style="font-family:'DM Sans',sans-serif; color:#5f5f5f; font-size:0.9rem; margin-top:0;">
+  Fara Electronica - panel de administracion.
 </p>
 {% endblock %}
 
 {% block content %}
 
-<!-- Tarjetas de estadisticas (se llenan via API) -->
-<div class="r66-dash-grid" id="r66-stats">
-  <div class="r66-stat">
-    <div class="r66-stat-label">Ingresos totales</div>
-    <div class="r66-stat-valor" id="st-ingresos">--</div>
-    <div class="r66-stat-sub">ordenes pagadas</div>
+<div class="fa-dash-grid" id="fa-stats">
+  <div class="fa-stat">
+    <div class="fa-stat-info">
+      <span class="fa-stat-label">Ventas totales</span>
+      <span class="fa-stat-valor" id="st-ingresos">--</span>
+      <span class="fa-stat-sub">ordenes pagadas</span>
+    </div>
+    <div class="fa-stat-icon">&#36;</div>
   </div>
-  <div class="r66-stat">
-    <div class="r66-stat-label">Utilidad</div>
-    <div class="r66-stat-valor" id="st-utilidad">--</div>
-    <div class="r66-stat-sub">ingresos menos costos</div>
+  <div class="fa-stat">
+    <div class="fa-stat-info">
+      <span class="fa-stat-label">Utilidad</span>
+      <span class="fa-stat-valor" id="st-utilidad">--</span>
+      <span class="fa-stat-sub">ingresos menos costos</span>
+    </div>
+    <div class="fa-stat-icon">&#9650;</div>
   </div>
-  <div class="r66-stat">
-    <div class="r66-stat-label">Margen</div>
-    <div class="r66-stat-valor" id="st-margen">--</div>
-    <div class="r66-stat-sub">rentabilidad promedio</div>
+  <div class="fa-stat">
+    <div class="fa-stat-info">
+      <span class="fa-stat-label">Margen</span>
+      <span class="fa-stat-valor" id="st-margen">--</span>
+      <span class="fa-stat-sub">rentabilidad promedio</span>
+    </div>
+    <div class="fa-stat-icon">&#37;</div>
   </div>
-  <div class="r66-stat">
-    <div class="r66-stat-label">Ordenes pagadas</div>
-    <div class="r66-stat-valor" id="st-ordenes">--</div>
-    <div class="r66-stat-sub">total historico</div>
+  <div class="fa-stat">
+    <div class="fa-stat-info">
+      <span class="fa-stat-label">Ordenes</span>
+      <span class="fa-stat-valor" id="st-ordenes">--</span>
+      <span class="fa-stat-sub">pagadas en total</span>
+    </div>
+    <div class="fa-stat-icon">&#128230;</div>
   </div>
 </div>
 
-<!-- Ranking de productos -->
-<div class="r66-rank">
-  <div class="r66-rank-box">
-    <div class="r66-rank-titulo">Mas vendidos</div>
-    <div id="r66-mas">Sin datos aun.</div>
+<div class="fa-rank">
+  <div class="fa-rank-box">
+    <div class="fa-rank-titulo">Mas vendidos</div>
+    <div id="fa-mas">Sin datos aun.</div>
   </div>
-  <div class="r66-rank-box">
-    <div class="r66-rank-titulo">Menos vendidos</div>
-    <div id="r66-menos">Sin datos aun.</div>
+  <div class="fa-rank-box">
+    <div class="fa-rank-titulo">Menos vendidos</div>
+    <div id="fa-menos">Sin datos aun.</div>
   </div>
 </div>
 
-<!-- Accesos directos -->
-<div class="r66-dash-accesos">
-  <a class="r66-acceso" href="{% url 'admin:productos_producto_changelist' %}">
-    <div class="r66-acceso-tag">Catalogo</div>
-    <div class="r66-acceso-titulo">Productos</div>
-    <div class="r66-acceso-desc">Ver, editar, costos y stock.</div>
+<div class="fa-accesos">
+  <a class="fa-acceso" href="{% url 'admin:productos_producto_changelist' %}">
+    <div class="fa-acceso-tag">Catalogo</div>
+    <div class="fa-acceso-titulo">Productos</div>
+    <div class="fa-acceso-desc">Ver, editar, costos y stock.</div>
   </a>
-  <a class="r66-acceso" href="{% url 'admin:productos_producto_add' %}">
-    <div class="r66-acceso-tag">Nuevo</div>
-    <div class="r66-acceso-titulo">Agregar producto</div>
-    <div class="r66-acceso-desc">Crear un producto y subir fotos.</div>
+  <a class="fa-acceso" href="{% url 'admin:productos_producto_add' %}">
+    <div class="fa-acceso-tag">Nuevo</div>
+    <div class="fa-acceso-titulo">Agregar producto</div>
+    <div class="fa-acceso-desc">Crear un producto y subir fotos.</div>
   </a>
-  <a class="r66-acceso" href="{% url 'admin:productos_orden_changelist' %}">
-    <div class="r66-acceso-tag">Ventas</div>
-    <div class="r66-acceso-titulo">Ordenes</div>
-    <div class="r66-acceso-desc">Historial de compras y estados.</div>
+  <a class="fa-acceso" href="{% url 'admin:productos_orden_changelist' %}">
+    <div class="fa-acceso-tag">Ventas</div>
+    <div class="fa-acceso-titulo">Ordenes</div>
+    <div class="fa-acceso-desc">Historial de compras y estados.</div>
   </a>
 </div>
 
@@ -71,15 +80,10 @@
 
 <script>
 (function () {
-  // El dashboard usa el token JWT del admin si existe en localStorage.
-  // Nota: el endpoint /api/estadisticas/ requiere ser admin.
   var token = localStorage.getItem('access_token');
   var headers = {};
   if (token) { headers['Authorization'] = 'Bearer ' + token; }
-
-  function fmt(n) {
-    return '$' + (n || 0).toLocaleString('es-CL');
-  }
+  function fmt(n) { return '$' + (n || 0).toLocaleString('es-CL'); }
 
   fetch('/api/estadisticas/', { headers: headers })
     .then(function (r) { if (!r.ok) throw new Error('no-auth'); return r.json(); })
@@ -88,30 +92,26 @@
       document.getElementById('st-utilidad').textContent = fmt(d.utilidad_total);
       document.getElementById('st-margen').textContent = (d.margen_porcentaje || 0) + '%';
       document.getElementById('st-ordenes').textContent = d.ordenes_pagadas || 0;
-
-      function pinta(lista, contId) {
-        var cont = document.getElementById(contId);
-        if (!lista || lista.length === 0) { cont.textContent = 'Sin datos aun.'; return; }
-        cont.innerHTML = '';
+      function pinta(lista, id) {
+        var c = document.getElementById(id);
+        if (!lista || lista.length === 0) { c.textContent = 'Sin datos aun.'; return; }
+        c.innerHTML = '';
         lista.forEach(function (it) {
           var row = document.createElement('div');
-          row.className = 'r66-rank-item';
-          row.innerHTML = '<span>' + it.nombre_producto + '</span>' +
-                          '<span class="r66-rank-unidades">' + it.unidades + ' u.</span>';
-          cont.appendChild(row);
+          row.className = 'fa-rank-item';
+          row.innerHTML = '<span>' + it.nombre_producto + '</span><span class="fa-rank-unidades">' + it.unidades + ' u.</span>';
+          c.appendChild(row);
         });
       }
-      pinta(d.mas_vendidos, 'r66-mas');
-      pinta(d.menos_vendidos, 'r66-menos');
+      pinta(d.mas_vendidos, 'fa-mas');
+      pinta(d.menos_vendidos, 'fa-menos');
     })
     .catch(function () {
-      // Si no hay token de admin en localStorage, mostramos aviso suave.
-      var s = document.getElementById('r66-stats');
+      var s = document.getElementById('fa-stats');
       if (s) {
         s.insertAdjacentHTML('beforebegin',
-          '<div style="font-family:DM Sans,sans-serif;font-size:0.8rem;color:#5f7a95;margin-bottom:16px;">' +
-          'Las estadisticas se cargan al iniciar sesion como administrador desde la web.' +
-          '</div>');
+          '<div style="font-family:DM Sans,sans-serif;font-size:0.8rem;color:#5f5f5f;margin-bottom:16px;">' +
+          'Inicia sesion como administrador desde la web para ver las estadisticas.</div>');
       }
     });
 })();

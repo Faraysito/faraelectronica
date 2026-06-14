@@ -1,0 +1,118 @@
+/* ===== Variables de tema (dark por defecto, light opcional) ===== */
+:root,
+:root[data-tema="dark"] {
+  --fondo: #0b0b0b;
+  --fondo-2: #111;
+  --fondo-3: #1a1a1a;
+  --texto: #f5f5f5;
+  --texto-suave: #aaa;
+  --texto-tenue: #666;
+  --borde: #222;
+  --amarillo: #f5c800;
+  --card-grad-1: #111;
+  --card-grad-2: #1a1a1a;
+}
+
+:root[data-tema="light"] {
+  --fondo: #f4f5f7;
+  --fondo-2: #ffffff;
+  --fondo-3: #eceef1;
+  --texto: #1a1a1a;
+  --texto-suave: #555;
+  --texto-tenue: #999;
+  --borde: #e0e3e8;
+  --amarillo: #e0a200;
+  --card-grad-1: #ffffff;
+  --card-grad-2: #f7f8fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Evita scroll horizontal en móvil */
+body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Botón flotante de cambio de tema */
+.theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--amarillo);
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* ===== Animación: producto volando al carrito ===== */
+@keyframes volar-carrito {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) translate(var(--fly-x), var(--fly-y));
+  }
+}
+
+.fly-img {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  z-index: 6000;
+  pointer-events: none;
+  animation: volar-carrito 0.8s cubic-bezier(0.5, -0.3, 0.7, 1) forwards;
+}
+
+/* ===== Skeleton loaders ===== */
+@keyframes skeleton-pulse {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--fondo-2) 25%,
+    var(--fondo-3) 50%,
+    var(--fondo-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}

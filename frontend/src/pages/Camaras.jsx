@@ -37,6 +37,24 @@ function Camaras() {
     return 0;
   });
 
+  // Animacion: la imagen del producto "vuela" hacia el icono del carrito
+  const volarAlCarrito = (e, producto) => {
+    const card = e.currentTarget.closest(".prod-card");
+    const img = card ? card.querySelector(".prod-img") : null;
+    if (!img) return;
+    const rect = img.getBoundingClientRect();
+    const fly = document.createElement("img");
+    fly.src = producto.imagen_principal;
+    fly.className = "fly-img";
+    fly.style.left = rect.left + "px";
+    fly.style.top = rect.top + "px";
+    // destino: esquina superior derecha (donde esta el carrito en la navbar)
+    fly.style.setProperty("--fly-x", window.innerWidth - rect.left - 120 + "px");
+    fly.style.setProperty("--fly-y", -rect.top + 30 + "px");
+    document.body.appendChild(fly);
+    setTimeout(() => fly.remove(), 800);
+  };
+
   const handleAgregar = (e, producto) => {
     e.stopPropagation();
     // Si no hay sesión, NO agrega: abre el login con Google.
@@ -44,6 +62,7 @@ function Camaras() {
       setMostrarLogin(true);
       return;
     }
+    volarAlCarrito(e, producto);
     agregarAlCarrito(producto);
     setAgregados((prev) => ({ ...prev, [producto.id]: true }));
     setTimeout(
@@ -136,11 +155,18 @@ function Camaras() {
       )}
 
       <div className="prod-grid">
-        {loading && (
-          <div className="loading-state">
-            CARGANDO (PUEDE TARDAR UNOS MINUTOS)...
-          </div>
-        )}
+        {loading &&
+          Array.from({ length: 6 }).map((_, i) => (
+            <div className="prod-card" key={"sk" + i}>
+              <div className="skeleton" style={{ height: "240px" }}></div>
+              <div className="prod-body">
+                <div className="skeleton" style={{ height: "20px", width: "70%", marginBottom: "10px" }}></div>
+                <div className="skeleton" style={{ height: "14px", width: "100%", marginBottom: "6px" }}></div>
+                <div className="skeleton" style={{ height: "14px", width: "85%", marginBottom: "18px" }}></div>
+                <div className="skeleton" style={{ height: "32px", width: "50%" }}></div>
+              </div>
+            </div>
+          ))}
         {!loading && productos.length === 0 && (
           <div className="empty-state">
             <p>No hay productos disponibles en esta categoría.</p>

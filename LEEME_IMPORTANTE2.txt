@@ -1,0 +1,60 @@
+========================================================
+FARA ELECTRONICA - Paquete de mejoras (diseno/experiencia)
+========================================================
+
+Formato: .zip (este entorno no genera .rar; se abre igual con doble clic).
+TODO el frontend fue validado (compila sin errores). El manual LaTeX fue
+compilado a PDF correctamente.
+
+--------------------------------------------------------
+QUE INCLUYE
+--------------------------------------------------------
+1. Responsive movil   -> paddings adaptados + viewport (index.html, index.css, CSS admin)
+2. Skeleton loaders   -> cajas grises animadas mientras cargan productos (Camaras/Calefaccion)
+3. Animacion carrito  -> el producto "vuela" al icono del carrito al agregar
+4. Zoom en imagenes   -> en el modal de Detalles, pasar el cursor amplia la foto
+5. Favicon + meta tags-> previsualizacion al compartir en WhatsApp (index.html)
+6. Modo claro/oscuro  -> boton flotante abajo a la derecha (ThemeContext + index.css)
+7. Padding general    -> mejorado en varias vistas
+8. Admin estructurado -> dashboard estilo "Cash Market" con tarjetas, manteniendo amarillo/negro
+9. Manual LaTeX       -> manual_fara_electronica.tex (para Overleaf): usuario + admin
+
+--------------------------------------------------------
+DONDE VA CADA ARCHIVO (copiar y reemplazar)
+--------------------------------------------------------
+FRONTEND:
+  frontend/index.html                          -> REEMPLAZAR (favicon, meta tags, viewport)
+  frontend/src/main.jsx                         -> REEMPLAZAR (envuelve con ThemeProvider)
+  frontend/src/index.css                        -> REEMPLAZAR (variables de tema, skeletons, animacion)
+  frontend/src/App.jsx                          -> REEMPLAZAR (boton de tema)
+  frontend/src/context/ThemeContext.jsx         -> NUEVO (modo claro/oscuro)
+  frontend/src/context/CarritoContext.jsx       -> REEMPLAZAR
+  frontend/src/components/Navbar.jsx            -> REEMPLAZAR
+  frontend/src/components/CarritoModal.jsx      -> REEMPLAZAR
+  frontend/src/components/CompraModal.jsx       -> NUEVO
+  frontend/src/components/ProductoModal.jsx     -> REEMPLAZAR (zoom)
+  frontend/src/components/HistorialModal.jsx    -> NUEVO
+  frontend/src/pages/Camaras.jsx                -> REEMPLAZAR (skeleton + animacion)
+  frontend/src/pages/Calefaccion.jsx            -> REEMPLAZAR
+  frontend/src/pages/PagoRetorno.jsx            -> NUEVO
+
+BACKEND (solo diseno del admin):
+  backend/productos/static/admin/css/fara_admin.css  -> REEMPLAZAR (dashboard amarillo/negro)
+  backend/templates/admin/base_site.html             -> REEMPLAZAR
+  backend/templates/admin/index.html                 -> REEMPLAZAR (dashboard con tarjetas)
+
+MANUAL:
+  manual_fara_electronica.tex  -> subir a overleaf.com (New Project > Upload) y compilar
+
+--------------------------------------------------------
+NOTAS IMPORTANTES
+--------------------------------------------------------
+- El favicon usa /src/assets/images/logo.png. Si tu logo tiene otro nombre o ruta,
+  ajusta las lineas de <link rel="icon"> y las meta og:image / twitter:image en index.html.
+- En el admin: tras reemplazar el CSS, corre "collectstatic" en produccion.
+- NO corras "npx prettier --write ." sobre las plantillas .html del admin (las rompe).
+  Ya deberias tener .prettierignore de antes.
+- Si algo se ve raro, revisa la consola del navegador (F12) y lo ajustamos en otra sesion.
+
+Este paquete es SOLO mejoras de diseno/experiencia + manual. Las 5 features de
+backend (Webpay, historial, etc.) van en el paquete anterior.

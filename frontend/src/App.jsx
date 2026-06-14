@@ -7,14 +7,15 @@ import Home from "./pages/Home";
 import Camaras from "./pages/Camaras";
 import Calefaccion from "./pages/Calefaccion";
 import PagoRetorno from "./pages/PagoRetorno";
+import { useTema } from "./context/ThemeContext";
 
 function AnimatedRoutes() {
   const location = useLocation();
   const prevPath = useRef(location.pathname);
 
   const getDirection = (from, to) => {
-    if (to === "/") return -100; // volver a home (hacia atras)
-    return 100; // avanzar
+    if (to === "/") return -100;
+    return 100;
   };
 
   const direction = getDirection(prevPath.current, location.pathname);
@@ -26,76 +27,45 @@ function AnimatedRoutes() {
     exit: { x: -direction + "%", opacity: 0 },
   };
 
+  const wrap = (Comp) => (
+    <motion.div
+      variants={variants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.4 }}
+    >
+      {Comp}
+    </motion.div>
+  );
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <motion.div
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.4 }}
-            >
-              <Home />
-            </motion.div>
-          }
-        />
-        <Route
-          path="/camaras"
-          element={
-            <motion.div
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.4 }}
-            >
-              <Camaras />
-            </motion.div>
-          }
-        />
-        <Route
-          path="/calefaccion"
-          element={
-            <motion.div
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.4 }}
-            >
-              <Calefaccion />
-            </motion.div>
-          }
-        />
-        <Route
-          path="/pago/retorno"
-          element={
-            <motion.div
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.4 }}
-            >
-              <PagoRetorno />
-            </motion.div>
-          }
-        />
+        <Route path="/" element={wrap(<Home />)} />
+        <Route path="/camaras" element={wrap(<Camaras />)} />
+        <Route path="/calefaccion" element={wrap(<Calefaccion />)} />
+        <Route path="/pago/retorno" element={wrap(<PagoRetorno />)} />
       </Routes>
     </AnimatePresence>
   );
 }
 
 function App() {
+  const { tema, toggleTema } = useTema();
+
   return (
     <BrowserRouter>
       <Navbar />
       <AnimatedRoutes />
       <Footer />
+      <button
+        className="theme-toggle"
+        onClick={toggleTema}
+        title={tema === "dark" ? "Modo claro" : "Modo oscuro"}
+      >
+        {tema === "dark" ? "☀️" : "🌙"}
+      </button>
     </BrowserRouter>
   );
 }

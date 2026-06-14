@@ -391,7 +391,7 @@ function Home() {
             <p className="modal-nota">
               ya migre la base de datos a Supabase despues de que la instancia
               free de Render expirara. todo funcionando: login con Google,
-              productos guardandose y mostrandose correctamente :)
+              productos guardandose y mostrandose correctamente 
             </p>
 
             <button className="modal-btn" onClick={cerrarAviso}>

@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Camaras from "./pages/Camaras";
 import Calefaccion from "./pages/Calefaccion";
+import PagoRetorno from "./pages/PagoRetorno";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -67,6 +68,20 @@ function AnimatedRoutes() {
               transition={{ duration: 0.4 }}
             >
               <Calefaccion />
+            </motion.div>
+          }
+        />
+        <Route
+          path="/pago/retorno"
+          element={
+            <motion.div
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ duration: 0.4 }}
+            >
+              <PagoRetorno />
             </motion.div>
           }
         />

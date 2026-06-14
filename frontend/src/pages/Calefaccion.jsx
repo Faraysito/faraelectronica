@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import ProductoModal from "../components/ProductoModal";
+import CarritoModal from "../components/CarritoModal";
+import CompraModal from "../components/CompraModal";
+import LoginModal from "../components/LoginModal";
 import { useCarrito } from "../context/CarritoContext";
 
 function Calefaccion() {
@@ -8,8 +11,12 @@ function Calefaccion() {
   const [loading, setLoading] = useState(true);
   const [orden, setOrden] = useState("defecto");
   const [agregados, setAgregados] = useState({});
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const [comprarProducto, setComprarProducto] = useState(null);
   const { agregarAlCarrito } = useCarrito();
-  const usuario = JSON.parse(localStorage.getItem("user") || "null");
+
+  const hayUsuario = () => !!localStorage.getItem("user");
 
   useEffect(() => {
     fetch(
@@ -32,12 +39,23 @@ function Calefaccion() {
 
   const handleAgregar = (e, producto) => {
     e.stopPropagation();
+    // Si no hay sesión, NO agrega: abre el login con Google.
+    if (!hayUsuario()) {
+      setMostrarLogin(true);
+      return;
+    }
     agregarAlCarrito(producto);
     setAgregados((prev) => ({ ...prev, [producto.id]: true }));
     setTimeout(
       () => setAgregados((prev) => ({ ...prev, [producto.id]: false })),
       1500,
     );
+  };
+
+  // Comprar: abre el modal de compra (Webpay + WhatsApp + cantidad)
+  const handleComprar = (e, producto) => {
+    e.stopPropagation();
+    setComprarProducto(producto);
   };
 
   return (
@@ -68,17 +86,21 @@ function Calefaccion() {
         .prod-card:hover .prod-img { filter: brightness(1.05) saturate(1.1); transform: scale(1.05); }
         .prod-img-container { width: 100%; height: 240px; overflow: hidden; background: #000; position: relative; }
         .prod-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9); display: block; transition: all 0.4s ease; }
+        .prod-agotado-badge { position: absolute; top: 12px; right: 12px; z-index: 2; background: #ff4444; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; }
         .prod-body { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
         .prod-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 1.35rem; color: #f5f5f5; letter-spacing: 0.04em; margin: 0 0 8px; line-height: 1.3; }
         .prod-desc { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; color: #888; font-weight: 300; line-height: 1.5; margin: 0 0 18px; flex-grow: 1; }
         .prod-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid #222; padding-top: 16px; margin-top: auto; flex-wrap: wrap; }
         .prod-precio { font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; color: #f5c800; margin: 0; }
-        .prod-btns { display: flex; gap: 6px; }
+        .prod-btns { display: flex; gap: 6px; flex-wrap: wrap; }
         .btn-ver-mas { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; background: transparent; border: 1.5px solid #f5c800; color: #f5c800; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
         .btn-ver-mas:hover { background: #f5c800; color: #000; box-shadow: 0 4px 12px rgba(245,200,0,0.3); }
-        .btn-agregar { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; background: #f5c800; color: #000; }
-        .btn-agregar:hover { background: #ffd700; box-shadow: 0 4px 12px rgba(245,200,0,0.4); }
-        .btn-agregar.agregado { background: #25D366; color: #fff; }
+        .btn-agregar { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; background: transparent; border: 1.5px solid #4caf50; color: #4caf50; }
+        .btn-agregar:hover { background: #4caf50; color: #fff; }
+        .btn-agregar.agregado { background: #25D366; color: #fff; border-color: #25D366; }
+        .btn-comprar-card { font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; background: #f5c800; color: #000; }
+        .btn-comprar-card:hover { background: #ffd700; box-shadow: 0 4px 12px rgba(245,200,0,0.4); }
+        .btn-disabled { background: #2a2a2a !important; color: #666 !important; border-color: #2a2a2a !important; cursor: not-allowed !important; box-shadow: none !important; }
         .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666; }
         .empty-state p { font-family: 'DM Sans', sans-serif; font-size: 1rem; }
         .loading-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666; font-family: 'DM Sans', sans-serif; }
@@ -132,6 +154,7 @@ function Calefaccion() {
             onClick={() => setSeleccionado(p)}
           >
             <div className="prod-img-container">
+              {p.agotado && <span className="prod-agotado-badge">Agotado</span>}
               <img
                 src={p.imagen_principal}
                 alt={p.nombre}
@@ -146,14 +169,6 @@ function Calefaccion() {
                   ${p.precio?.toLocaleString("es-CL") || "0"}
                 </p>
                 <div className="prod-btns">
-                  {usuario && (
-                    <button
-                      className={`btn-agregar${agregados[p.id] ? " agregado" : ""}`}
-                      onClick={(e) => handleAgregar(e, p)}
-                    >
-                      {agregados[p.id] ? "✓ Agregado" : "+ Carrito"}
-                    </button>
-                  )}
                   <button
                     className="btn-ver-mas"
                     onClick={(e) => {
@@ -162,6 +177,20 @@ function Calefaccion() {
                     }}
                   >
                     Detalles
+                  </button>
+                  <button
+                    className={`btn-agregar${agregados[p.id] ? " agregado" : ""}${p.agotado ? " btn-disabled" : ""}`}
+                    onClick={(e) => !p.agotado && handleAgregar(e, p)}
+                    disabled={p.agotado}
+                  >
+                    {agregados[p.id] ? "✓" : "+ Carrito"}
+                  </button>
+                  <button
+                    className={`btn-comprar-card${p.agotado ? " btn-disabled" : ""}`}
+                    onClick={(e) => !p.agotado && handleComprar(e, p)}
+                    disabled={p.agotado}
+                  >
+                    Comprar
                   </button>
                 </div>
               </div>
@@ -174,6 +203,24 @@ function Calefaccion() {
         <ProductoModal
           producto={seleccionado}
           onClose={() => setSeleccionado(null)}
+        />
+      )}
+      {mostrarCarrito && (
+        <CarritoModal onClose={() => setMostrarCarrito(false)} />
+      )}
+      {comprarProducto && (
+        <CompraModal
+          producto={comprarProducto}
+          onClose={() => setComprarProducto(null)}
+        />
+      )}
+      {mostrarLogin && (
+        <LoginModal
+          onClose={() => setMostrarLogin(false)}
+          onLoginSuccess={() => {
+            setMostrarLogin(false);
+            setMostrarCarrito(true);
+          }}
         />
       )}
     </div>

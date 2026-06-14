@@ -1,11 +1,69 @@
+import { useState } from "react";
 import { useCarrito } from "../context/CarritoContext";
 
-const WSP_NUMERO = "56940261248"; //
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://faraelectronica-backend.onrender.com";
+
+const WSP_NUMERO = "56940261248";
 
 function CarritoModal({ onClose }) {
   const { carrito, quitarDelCarrito, cambiarCantidad, total } = useCarrito();
+  const [pagando, setPagando] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleComprar = () => {
+  const handlePagarWebpay = async () => {
+    if (carrito.length === 0) return;
+    setPagando(true);
+    setError(null);
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setError("Debes iniciar sesión para pagar.");
+      setPagando(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/webpay/crear/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: carrito.map((p) => ({ id: p.id, cantidad: p.cantidad })),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "No se pudo iniciar el pago.");
+        setPagando(false);
+        return;
+      }
+
+      // Webpay funciona enviando un POST con el token a su URL.
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.url;
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "token_ws";
+      input.value = data.token;
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    } catch (err) {
+      console.error(err);
+      setError("Error de conexión con el servidor.");
+      setPagando(false);
+    }
+  };
+
+  // Comprar directo con el vendedor por WhatsApp
+  const handleComprarVendedor = () => {
     if (carrito.length === 0) return;
     const lista = carrito
       .map(
@@ -14,7 +72,7 @@ function CarritoModal({ onClose }) {
       )
       .join("\n");
     const mensaje = encodeURIComponent(
-      `Hola! Quiero comprar los siguiente/es productos:\n\n${lista}\n\nTotal: $${total.toLocaleString("es-CL")}`,
+      `Hola buenas, quisiera comprar:\n\n${lista}\n\nTotal: $${total.toLocaleString("es-CL")}`,
     );
     window.open(`https://wa.me/${WSP_NUMERO}?text=${mensaje}`, "_blank");
   };
@@ -55,10 +113,15 @@ function CarritoModal({ onClose }) {
         .carrito-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .carrito-total-label { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; }
         .carrito-total-valor { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #f5c800; letter-spacing: 0.04em; }
-        .carrito-btns { display: flex; gap: 10px; }
-        .btn-comprar { flex: 1; padding: 14px; background: #25D366; border: none; border-radius: 6px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-comprar:hover { background: #1ebe5a; box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
-        .btn-comprar:disabled { background: #1a3a24; color: #555; cursor: not-allowed; box-shadow: none; }
+        .carrito-error { background: #ff4444; color: #fff; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; }
+        .carrito-btns { display: flex; flex-direction: column; gap: 10px; }
+        .carrito-btns-fila { display: flex; gap: 10px; }
+        .btn-pagar { flex: 1; padding: 14px; background: #f5c800; border: none; border-radius: 6px; color: #000; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-pagar:hover { background: #ffd700; box-shadow: 0 4px 16px rgba(245,200,0,0.3); }
+        .btn-pagar:disabled { background: #3a3a1a; color: #777; cursor: not-allowed; box-shadow: none; }
+        .btn-wsp { width: 100%; padding: 13px; background: #25D366; border: none; border-radius: 6px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-wsp:hover { background: #1ebe5a; box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
+        .btn-wsp:disabled { background: #1a3a24; color: #555; cursor: not-allowed; box-shadow: none; }
         .btn-cerrar-carrito { padding: 14px 20px; background: transparent; border: 1px solid #333; color: #888; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; }
         .btn-cerrar-carrito:hover { border-color: #555; color: #aaa; }
         .carrito-vacio { text-align: center; padding: 40px 0; color: #555; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
@@ -117,6 +180,7 @@ function CarritoModal({ onClose }) {
         </div>
 
         <div className="carrito-footer">
+          {error && <div className="carrito-error">⚠️ {error}</div>}
           <div className="carrito-total">
             <span className="carrito-total-label">TOTAL</span>
             <span className="carrito-total-valor">
@@ -124,12 +188,21 @@ function CarritoModal({ onClose }) {
             </span>
           </div>
           <div className="carrito-btns">
-            <button className="btn-cerrar-carrito" onClick={onClose}>
-              Cerrar
-            </button>
+            <div className="carrito-btns-fila">
+              <button className="btn-cerrar-carrito" onClick={onClose}>
+                Cerrar
+              </button>
+              <button
+                className="btn-pagar"
+                onClick={handlePagarWebpay}
+                disabled={carrito.length === 0 || pagando}
+              >
+                {pagando ? "Redirigiendo..." : "Pagar con Webpay"}
+              </button>
+            </div>
             <button
-              className="btn-comprar"
-              onClick={handleComprar}
+              className="btn-wsp"
+              onClick={handleComprarVendedor}
               disabled={carrito.length === 0}
             >
               <svg
@@ -141,7 +214,7 @@ function CarritoModal({ onClose }) {
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                 <path d="M5.077 0C2.268 0 0 2.268 0 5.077v13.846C0 21.732 2.268 24 5.077 24h13.846C21.732 24 24 21.732 24 18.923V5.077C24 2.268 21.732 0 18.923 0H5.077zm8.399 18.075c-1.197 0-2.368-.32-3.395-.928L5.5 18.5l1.37-4.497a6.87 6.87 0 01-.977-3.542C5.893 7.001 8.894 4 12.476 4c3.582 0 6.583 3.001 6.583 6.461 0 3.46-3.001 6.614-6.583 6.614z" />
               </svg>
-              Comprar por WhatsApp
+              Comprar con el vendedor
             </button>
           </div>
         </div>

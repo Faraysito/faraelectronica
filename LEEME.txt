@@ -1,0 +1,17 @@
+ACTUALIZACION: separar DETALLES (solo info) y COMPRAR (Webpay + WhatsApp + cantidad)
+
+Copia/reemplaza estos 4 archivos:
+
+  frontend/src/components/ProductoModal.jsx   (REEMPLAZAR - boton "Detalles": ahora solo info, sin compra)
+  frontend/src/components/CompraModal.jsx     (NUEVO - boton "Comprar": Webpay + WhatsApp + selector de cantidad)
+  frontend/src/pages/Camaras.jsx              (REEMPLAZAR)
+  frontend/src/pages/Calefaccion.jsx          (REEMPLAZAR)
+
+Comportamiento:
+- "DETALLES" -> abre modal con galeria de fotos, precio y descripcion. Solo info.
+- "COMPRAR"  -> abre modal con cantidad ajustable, "Pagar con Webpay" (pide login con Google)
+               y "Contactar con vendedor" (WhatsApp 56940261248).
+- "+ CARRITO" -> si no hay sesion, abre login; si hay sesion, agrega al carrito.
+
+NO requiere migraciones ni comandos. Solo reemplazar y recargar (Ctrl+F5).
+El boton Webpay solo funciona si ya aplicaste el paquete del backend (migraciones + SDK Transbank).

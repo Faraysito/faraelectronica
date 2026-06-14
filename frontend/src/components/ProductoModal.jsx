@@ -148,38 +148,16 @@ const ProductoModal = ({ producto, onClose }) => {
           </p>
 
           <button
-            onClick={() =>
-              window.open(
-                `https://wa.me/56940261248?text=Hola, me interesa el producto: ${producto.nombre}`,
-                "_blank",
-              )
-            }
-            style={{
-              background: "#25d366",
-              color: "#fff",
-              border: "none",
-              width: "100%",
-              padding: "14px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              borderRadius: "6px",
-              fontSize: "1rem",
-            }}
-          >
-            CONSULTAR WHATSAPP
-          </button>
-
-          <button
             onClick={onClose}
             style={{
-              marginTop: "12px",
               background: "transparent",
               border: "1px solid #444",
               color: "#888",
               width: "100%",
-              padding: "10px",
+              padding: "12px",
               cursor: "pointer",
               borderRadius: "6px",
+              fontFamily: "DM Sans, sans-serif",
             }}
           >
             Cerrar

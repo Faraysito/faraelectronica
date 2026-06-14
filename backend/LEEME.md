@@ -37,6 +37,7 @@ productos/
   Si ya tienes `productos/static`, solo fusiona, no se pisa nada.
 
 Resultado:
+
 ```
 backend/
 ├── manage.py
@@ -45,13 +46,14 @@ backend/
 └── productos/static/admin/css/fara_admin.css
 ```
 
-### Paso 2 · Editar `backend/backend/settings.py`  ⚠️ IMPORTANTE
+### Paso 2 · Editar `backend/backend/settings.py` ⚠️ IMPORTANTE
 
 En la lista `TEMPLATES`, cambia `'DIRS': []` por la ruta a `templates`.
 Esto es lo que hace que tus plantillas tengan prioridad sobre las del admin
 (con solo `APP_DIRS` NO funciona, porque `django.contrib.admin` va primero).
 
 Tu settings tiene esto:
+
 ```python
 TEMPLATES = [
     {
@@ -64,6 +66,7 @@ TEMPLATES = [
 ```
 
 Déjalo así:
+
 ```python
 TEMPLATES = [
     {
@@ -74,20 +77,25 @@ TEMPLATES = [
     },
 ]
 ```
+
 (`BASE_DIR` ya está definido arriba en tu settings, no hace falta importarlo.)
 
 ### Paso 3 · Recolectar estáticos
 
 **Local:** nada extra, solo:
+
 ```bash
 python manage.py runserver
 ```
+
 Entra a → http://127.0.0.1:8000/gestion-fara-super-user/
 
 **Producción (Render):**
+
 ```bash
 python manage.py collectstatic --noinput
 ```
+
 Tu deploy de Render normalmente ya corre esto en el build. Si ves el admin
 sin estilos en producción, es esto: vuelve a ejecutar `collectstatic`.
 
@@ -96,12 +104,14 @@ sin estilos en producción, es esto: vuelve a ejecutar `collectstatic`.
 ## 🛠️ Personalización opcional
 
 **Logo en el header (en vez del texto):**
+
 1. Guarda tu logo en `productos/static/admin/img/logo.png`.
 2. En `templates/admin/base_site.html`, descomenta la línea del `<img>`.
 
 **Cambiar colores:** edita las variables `--fara-*` al inicio de `fara_admin.css`.
 
 **Títulos del sitio** (opcional, en `backend/backend/urls.py`):
+
 ```python
 admin.site.site_header = "Fara Electrónica"
 admin.site.site_title = "Fara Admin"
@@ -122,5 +132,6 @@ admin.site.index_title = "Panel de gestión"
 ---
 
 ## 🔄 Para revertir
+
 Borra las 2 carpetas que copiaste y vuelve a poner `'DIRS': []` en settings.
 El admin regresa a su aspecto original.

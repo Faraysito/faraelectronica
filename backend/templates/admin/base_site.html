@@ -1,13 +1,17 @@
-{% extends "admin/base.html" %} {% load static %} {% block title %}{{ title }} |
-Fara Electrónica{% endblock %} {% block extrastyle %} {{ block.super }}
-<link rel="stylesheet" href="{% static 'admin/css/fara_admin.css' %}" />
-{% endblock %} {% block branding %}
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Fara Electrónica{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/fara_admin.css' %}">
+{% endblock %}
+
+{% block branding %}
 <div id="site-name">
-  <a href="{% url 'admin:index' %}">
-    {# Si subes un logo a productos/static/admin/img/logo.png, descomenta la
-    línea de abajo #} {#
-    <img src="{% static 'admin/img/logo.png' %}" class="fara-logo" alt="Fara" />
-    #} FARA ELECTRÓNICA
-  </a>
+  <a href="{% url 'admin:index' %}">FARA ELECTRÓNICA</a>
 </div>
-{% endblock %} {% block nav-global %}{% endblock %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

@@ -1,0 +1,6 @@
+# Plantillas de Django (Prettier las rompe)
+backend/**/templates/**/*.html
+
+# Entorno virtual y estáticos generados
+venv/
+backend/staticfiles/

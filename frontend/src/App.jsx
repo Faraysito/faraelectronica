@@ -12,7 +12,7 @@ function AnimatedRoutes() {
   const prevPath = useRef(location.pathname);
 
   const getDirection = (from, to) => {
-    if (to === "/") return -100; // volver a home (hacia atrás)
+    if (to === "/") return -100; // volver a home (hacia atras)
     return 100; // avanzar
   };
 

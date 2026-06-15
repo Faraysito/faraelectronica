@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import imgCamaras from "../assets/images/camaras.jpg";
 import imgCalefaccion from "../assets/images/calefaccion.jpg";
 import imgProximamente from "../assets/images/proximamente.avif";
@@ -34,129 +33,10 @@ const categorias = [
 function Home() {
   const navigate = useNavigate();
 
-  const [mostrarAviso, setMostrarAviso] = useState(() => {
-    return !sessionStorage.getItem("fara_aviso_visto");
-  });
-
-  const cerrarAviso = () => {
-    sessionStorage.setItem("fara_aviso_visto", "true");
-    setMostrarAviso(false);
-  };
-
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
-
-        .modal-overlay {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.88);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 999;
-          padding: 24px;
-        }
-
-        .modal-box {
-          background: #111;
-          border: 1px solid #2a2a00;
-          border-radius: 8px;
-          padding: 40px 36px;
-          max-width: 540px;
-          width: 100%;
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .modal-box::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #f5c800, transparent);
-        }
-
-        .modal-tag {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.65rem;
-          font-weight: 500;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: #f5c800;
-          border: 1px solid #f5c80044;
-          background: #f5c80012;
-          padding: 4px 12px;
-          border-radius: 20px;
-          display: inline-block;
-          margin-bottom: 20px;
-        }
-
-        .modal-titulo {
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: 2rem;
-          color: #f5f5f5;
-          letter-spacing: 0.08em;
-          margin: 0 0 16px;
-        }
-
-        .modal-texto {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.88rem;
-          color: #888;
-          font-weight: 300;
-          line-height: 1.8;
-          margin: 0 0 16px;
-        }
-
-        .modal-stack {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.8rem;
-          color: #444;
-          font-weight: 300;
-          line-height: 1.9;
-          margin: 0 0 20px;
-          background: #f5c80008;
-          border: 1px solid #2a2a00;
-          border-radius: 6px;
-          padding: 12px 16px;
-          text-align: left;
-        }
-
-        .modal-stack span {
-          color: #f5c800;
-          font-weight: 500;
-        }
-
-        .modal-nota {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.78rem;
-          color: #3a3a3a;
-          font-style: italic;
-          margin: 0 0 28px;
-          line-height: 1.6;
-        }
-
-        .modal-btn {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          background: #f5c800;
-          border: none;
-          color: #0a0a0a;
-          padding: 12px 28px;
-          border-radius: 3px;
-          cursor: pointer;
-          transition: background 0.2s ease;
-        }
-
-        .modal-btn:hover {
-          background: #e6b800;
-        }
 
         .hero-section {
           min-height: calc(100vh - 60px);
@@ -353,53 +233,7 @@ function Home() {
           transition: all 0.3s ease;
           display: inline-block;
         }
-          .modal-nota {
-  color: #888;
-}
       `}</style>
-
-      {mostrarAviso && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <span className="modal-tag">Nota del desarrollador</span>
-            <h2 className="modal-titulo">Un poco de contexto</h2>
-            <p className="modal-texto">
-              mi hermano menor necesita una página para vender sus productos,
-              así que le estoy haciendo una. La pagina seguira en desarrollo,
-              asi que tendra actualizaciones en diseño y funcionalidades
-            </p>
-            <p className="modal-stack">
-              <span>Frontend:</span> React · Vite · Bootstrap · React Router ·
-              JavaScript · CSS
-              <br />
-              <span>Backend:</span> Python · Django · Django REST Framework ·
-              Gunicorn · Whitenoise
-              <br />
-              <span>Base de datos:</span> PostgreSQL (Supabase)
-              <br />
-              <span>Despliegue:</span> Vercel · Render · Cloudinary · Supabase
-            </p>
-            <p className="modal-nota">
-              La página está lejos de estar terminada, pero es una pequeña
-              muestra del trabajo que puedo hacer.
-            </p>
-            <p className="modal-nota">
-              a veces tarda en iniciar sesion y mostrar los productos, cuando no
-              hay trafico, el host entra en reposo y puede demorar ~40 segundos
-              en despertar.
-            </p>
-            <p className="modal-nota">
-              ya migre la base de datos a Supabase despues de que la instancia
-              free de Render expirara. todo funcionando: login con Google,
-              productos guardandose y mostrandose correctamente 
-            </p>
-
-            <button className="modal-btn" onClick={cerrarAviso}>
-              VEAMOS LA PAGINA →
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="hero-section">
         <h1 className="hero-titulo">Nuestros Catálogos</h1>

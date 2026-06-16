@@ -49,7 +49,10 @@ function Camaras() {
     fly.style.left = rect.left + "px";
     fly.style.top = rect.top + "px";
     // destino: esquina superior derecha (donde esta el carrito en la navbar)
-    fly.style.setProperty("--fly-x", window.innerWidth - rect.left - 120 + "px");
+    fly.style.setProperty(
+      "--fly-x",
+      window.innerWidth - rect.left - 120 + "px",
+    );
     fly.style.setProperty("--fly-y", -rect.top + 30 + "px");
     document.body.appendChild(fly);
     setTimeout(() => fly.remove(), 800);
@@ -160,10 +163,22 @@ function Camaras() {
             <div className="prod-card" key={"sk" + i}>
               <div className="skeleton" style={{ height: "240px" }}></div>
               <div className="prod-body">
-                <div className="skeleton" style={{ height: "20px", width: "70%", marginBottom: "10px" }}></div>
-                <div className="skeleton" style={{ height: "14px", width: "100%", marginBottom: "6px" }}></div>
-                <div className="skeleton" style={{ height: "14px", width: "85%", marginBottom: "18px" }}></div>
-                <div className="skeleton" style={{ height: "32px", width: "50%" }}></div>
+                <div
+                  className="skeleton"
+                  style={{ height: "20px", width: "70%", marginBottom: "10px" }}
+                ></div>
+                <div
+                  className="skeleton"
+                  style={{ height: "14px", width: "100%", marginBottom: "6px" }}
+                ></div>
+                <div
+                  className="skeleton"
+                  style={{ height: "14px", width: "85%", marginBottom: "18px" }}
+                ></div>
+                <div
+                  className="skeleton"
+                  style={{ height: "32px", width: "50%" }}
+                ></div>
               </div>
             </div>
           ))}

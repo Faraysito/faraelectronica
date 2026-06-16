@@ -36,7 +36,9 @@ body {
   padding: 0;
   background: var(--fondo);
   color: var(--texto);
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Evita scroll horizontal en móvil */

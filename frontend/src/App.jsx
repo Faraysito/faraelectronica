@@ -1,13 +1,16 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef } from "react";
+import { useRef, lazy, Suspense } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Camaras from "./pages/Camaras";
 import Calefaccion from "./pages/Calefaccion";
 import PagoRetorno from "./pages/PagoRetorno";
+import NoEncontrado from "./pages/NoEncontrado";
 import { useTema } from "./context/ThemeContext";
+
+const AdminStats = lazy(() => import("./pages/AdminStats"));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -46,6 +49,15 @@ function AnimatedRoutes() {
         <Route path="/camaras" element={wrap(<Camaras />)} />
         <Route path="/calefaccion" element={wrap(<Calefaccion />)} />
         <Route path="/pago/retorno" element={wrap(<PagoRetorno />)} />
+        <Route
+          path="/admin/stats"
+          element={wrap(
+            <Suspense fallback={<div style={{ minHeight: "60vh" }} />}>
+              <AdminStats />
+            </Suspense>,
+          )}
+        />
+        <Route path="*" element={wrap(<NoEncontrado />)} />
       </Routes>
     </AnimatePresence>
   );

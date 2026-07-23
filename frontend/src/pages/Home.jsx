@@ -356,6 +356,53 @@ function Home() {
           .modal-nota {
   color: #888;
 }
+
+        .modal-admin {
+          font-family: 'DM Sans', sans-serif;
+          background: #f5c80010;
+          border: 1px solid #f5c80044;
+          border-radius: 6px;
+          padding: 14px 16px;
+          margin: 0 0 24px;
+          text-align: left;
+        }
+
+        .modal-admin-tag {
+          display: inline-block;
+          font-size: 0.6rem;
+          font-weight: 600;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #f5c800;
+          margin-bottom: 10px;
+        }
+
+        .modal-admin p {
+          font-size: 0.8rem;
+          color: #aaa;
+          font-weight: 300;
+          line-height: 1.7;
+          margin: 0 0 6px;
+        }
+
+        .modal-admin a {
+          display: block;
+          font-size: 0.78rem;
+          color: #f5c800;
+          word-break: break-all;
+          margin: 0 0 10px;
+          text-decoration: none;
+        }
+
+        .modal-admin a:hover { text-decoration: underline; }
+
+        .modal-admin .cred {
+          color: #f5f5f5;
+          font-weight: 500;
+          background: #ffffff12;
+          padding: 1px 8px;
+          border-radius: 3px;
+        }
       `}</style>
 
       {mostrarAviso && (
@@ -393,6 +440,22 @@ function Home() {
               free de Render expirara. todo funcionando: login con Google,
               productos guardandose y mostrandose correctamente
             </p>
+
+            <div className="modal-admin">
+              <span className="modal-admin-tag">Acceso al backend · Recruiters</span>
+              <p>Panel de administración (Django):</p>
+              <a
+                href="https://faraelectronica-backend.onrender.com/gestion-fara-super-user/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                faraelectronica-backend.onrender.com/gestion-fara-super-user/
+              </a>
+              <p>
+                Usuario: <span className="cred">admin</span>
+                {"   "}·{"   "}Contraseña: <span className="cred">Admin123</span>
+              </p>
+            </div>
 
             <button className="modal-btn" onClick={cerrarAviso}>
               VEAMOS LA PAGINA →

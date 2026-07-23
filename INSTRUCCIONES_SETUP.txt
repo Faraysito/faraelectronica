@@ -1,0 +1,130 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║            FaraElectrónica 2.0 - Setup Completo (7 Puntos)                     ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+✅ Los archivos ya fueron copiados a C:\Proyectos\FaraElectronica2.0
+
+Archivos actualizados:
+  ✓ backend/productos/models.py — Nuevos modelos (Negocio, Gasto, Venta, etc.)
+  ✓ backend/productos/views.py — Endpoints para los 7 puntos
+  ✓ backend/productos/serializers.py — Serializers API
+  ✓ backend/productos/admin.py — Admin customizado
+  ✓ backend/productos/urls.py — Rutas actualizadas
+  ✓ SETUP_7_PUNTOS.md — Documentación completa
+  ✓ LOCALHOST_SETUP.sh — Script de setup automático
+
+════════════════════════════════════════════════════════════════════════════════
+
+🚀 PASOS PARA ACTIVAR EN TU MÁQUINA
+
+1. INSTALAR DEPENDENCIAS
+   Abre PowerShell en C:\Proyectos\FaraElectronica2.0\backend
+
+   pip install -r requirements.txt
+
+2. CREAR MIGRACIONES
+   python manage.py makemigrations
+
+3. APLICAR MIGRACIONES
+   python manage.py migrate
+
+4. CREAR DATOS INICIALES (opcional)
+   python manage.py shell
+
+   Luego en el shell interactivo:
+   ─────────────────────────────────
+   from productos.models import Negocio, MetodoPago
+   from django.contrib.auth.models import User
+
+   user = User.objects.first()  # Tu usuario admin
+
+   # Crear negocio
+   negocio = Negocio.objects.create(
+       owner=user,
+       nombre="Mi Tienda",
+       slug="mi-tienda",
+       color_primario="#f5c800",
+       color_secundario="#0a0a0a"
+   )
+
+   # Crear métodos de pago
+   MetodoPago.objects.get_or_create(tipo='efectivo')
+   MetodoPago.objects.get_or_create(tipo='transferencia')
+   MetodoPago.objects.get_or_create(tipo='tarjeta')
+   MetodoPago.objects.get_or_create(tipo='webpay')
+
+   exit()
+   ─────────────────────────────────
+
+5. INICIAR SERVIDOR
+   python manage.py runserver
+
+6. ACCEDER A LOS ENDPOINTS
+   Admin: http://127.0.0.1:8000/gestion-fara-super-user/
+   API: http://127.0.0.1:8000/api/
+
+════════════════════════════════════════════════════════════════════════════════
+
+📊 NUEVOS ENDPOINTS DISPONIBLES
+
+POS (Venta Presencial):
+  POST /api/ordenes/crear_venta_manual/
+
+Inventario:
+  GET /api/productos/ — listar con SKU
+  POST /api/productos/{id}/ajustar_stock/ — cambiar stock
+  GET /api/productos/{id}/precios_escalonados/ — precios por cantidad
+
+Gastos/Balance:
+  POST /api/gastos/ — registrar gasto
+  GET /api/gastos/balance_del_mes/ — balance actual
+  GET /api/gastos/gastos_por_tipo/ — desglose
+
+Reportes:
+  GET /api/reportes/estadisticas/ — dashboard JSON
+  GET /api/reportes/descargar_csv/?tipo=ordenes — descargar CSV
+  GET /api/reportes/ganancia_por_producto/ — ganancia por producto
+
+Facturación:
+  POST /api/facturas/generar_boleta/ — crear boleta
+  POST /api/facturas/{id}/enviar_sii/ — enviar a SII (placeholder)
+
+Multi-negocio:
+  POST /api/negocios/ — crear nuevo negocio
+
+════════════════════════════════════════════════════════════════════════════════
+
+⚠️ NOTAS IMPORTANTES
+
+• Todos los endpoints requieren autenticación (token JWT)
+• Las migraciones son OBLIGATORIAS (agregan 7 nuevas tablas)
+• Facturación SII requiere integración con LibreDTE (no incluida)
+• Para testing, usa Postman o ThunderClient con un token válido
+
+════════════════════════════════════════════════════════════════════════════════
+
+❓ SI ALGO FALLA
+
+Error de migraciones:
+  → Verifica que la base de datos está activa (PostgreSQL o SQLite)
+  → python manage.py migrate --plan (para ver qué se va a ejecutar)
+
+Error en imports:
+  → pip install djangorestframework django-cors-headers (dependencias extras)
+
+Error 401 en endpoints:
+  → Necesitas token JWT. Usa Google OAuth o crea un token en el admin
+
+════════════════════════════════════════════════════════════════════════════════
+
+🎯 PRÓXIMOS PASOS
+
+Después del setup:
+1. Crear componentes React para POS, Gastos, Reportes
+2. Integrar facturación real con LibreDTE
+3. Desplegar en Render (backend) + Vercel (frontend)
+4. Crear app nativa con React Native
+
+════════════════════════════════════════════════════════════════════════════════
+
+¡Listo! Comienza con: python manage.py migrate

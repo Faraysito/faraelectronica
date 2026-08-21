@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import imgCamaras from "../assets/images/camaras.jpg";
 import imgCalefaccion from "../assets/images/calefaccion.jpg";
 import imgProximamente from "../assets/images/proximamente.avif";
@@ -43,6 +43,16 @@ function Home() {
     setMostrarAviso(false);
   };
 
+  // bloquea el scroll del body mientras el modal esta abierto
+  useEffect(() => {
+    if (!mostrarAviso) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mostrarAviso]);
+
   return (
     <>
       <style>{`
@@ -55,28 +65,34 @@ function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 999;
-          padding: 24px;
+          z-index: 3000;
+          padding: 24px 16px;
+          overscroll-behavior: contain;
         }
 
         .modal-box {
-          background: #111;
+          /* la linea amarilla va como background para que no se vaya al scrollear */
+          background:
+            linear-gradient(90deg, transparent, #f5c800, transparent) top / 100% 2px no-repeat,
+            #111;
           border: 1px solid #2a2a00;
           border-radius: 8px;
-          padding: 40px 36px;
+          padding: 36px 32px;
           max-width: 540px;
           width: 100%;
+          max-height: calc(100dvh - 48px);
+          overflow-y: auto;
+          overscroll-behavior: contain;
           text-align: center;
           position: relative;
-          overflow: hidden;
+          scrollbar-width: thin;
+          scrollbar-color: #f5c80055 transparent;
         }
 
-        .modal-box::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, #f5c800, transparent);
+        .modal-box::-webkit-scrollbar { width: 6px; }
+        .modal-box::-webkit-scrollbar-thumb {
+          background: #f5c80055;
+          border-radius: 3px;
         }
 
         .modal-tag {
@@ -114,7 +130,7 @@ function Home() {
         .modal-stack {
           font-family: 'DM Sans', sans-serif;
           font-size: 0.8rem;
-          color: #444;
+          color: #9a9a9a;
           font-weight: 300;
           line-height: 1.9;
           margin: 0 0 20px;
@@ -133,10 +149,14 @@ function Home() {
         .modal-nota {
           font-family: 'DM Sans', sans-serif;
           font-size: 0.78rem;
-          color: #3a3a3a;
+          color: #888;
           font-style: italic;
-          margin: 0 0 28px;
+          margin: 0 0 12px;
           line-height: 1.6;
+        }
+
+        .modal-nota:last-of-type {
+          margin-bottom: 24px;
         }
 
         .modal-btn {
@@ -156,6 +176,15 @@ function Home() {
 
         .modal-btn:hover {
           background: #e6b800;
+        }
+
+        @media (max-width: 480px) {
+          .modal-overlay { padding: 12px 10px; }
+          .modal-box {
+            padding: 28px 20px;
+            max-height: calc(100dvh - 24px);
+          }
+          .modal-titulo { font-size: 1.7rem; }
         }
 
         .hero-section {
@@ -353,10 +382,6 @@ function Home() {
           transition: all 0.3s ease;
           display: inline-block;
         }
-          .modal-nota {
-  color: #888;
-}
-
         .modal-admin {
           font-family: 'DM Sans', sans-serif;
           background: #f5c80010;

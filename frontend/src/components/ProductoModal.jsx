@@ -1,6 +1,19 @@
 import React, { useState, useRef } from "react";
 
+// Traduce el stock a texto + color para el badge del modal.
+const infoStock = (stock) => {
+  if (stock == null) return null;
+  if (stock <= 0) return { texto: "Sin stock", color: "#ff4444" };
+  if (stock <= 5)
+    return {
+      texto: `Últimas ${stock} ${stock === 1 ? "unidad" : "unidades"}`,
+      color: "#f5c800",
+    };
+  return { texto: `${stock} unidades disponibles`, color: "#4caf50" };
+};
+
 const ProductoModal = ({ producto, onClose }) => {
+  const stock = infoStock(producto.stock);
   const imagenes = [
     producto.imagen_principal,
     ...(producto.imagenes?.map((i) => i.imagen) || []),
@@ -163,6 +176,38 @@ const ProductoModal = ({ producto, onClose }) => {
           >
             ${producto.precio ? producto.precio.toLocaleString("es-CL") : "0"}
           </p>
+
+          {stock && (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                alignSelf: "flex-start",
+                border: `1px solid ${stock.color}55`,
+                background: `${stock.color}14`,
+                borderRadius: "50px",
+                padding: "6px 14px",
+                marginBottom: "15px",
+                fontFamily: "DM Sans, sans-serif",
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: stock.color,
+              }}
+            >
+              <span
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  borderRadius: "50%",
+                  background: stock.color,
+                  flexShrink: 0,
+                }}
+              />
+              {stock.texto}
+            </div>
+          )}
+
           <p
             style={{
               color: "var(--texto-suave, #aaa)",

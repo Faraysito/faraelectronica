@@ -6,7 +6,11 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
-:root {
+/* django define sus vars en html[data-theme="light"] (0,1,1) que le gana a :root,
+   por eso el admin se veia a medias en claro. Repetimos en los 3 selectores. */
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
   --fa-bg: #0a0a0a;
   --fa-sidebar: #111;
   --fa-panel: #141414;
@@ -53,6 +57,16 @@
   --object-tools-fg: #0a0a0a;
   --object-tools-hover-bg: #ffd633;
   --font-family-primary: "DM Sans", sans-serif;
+
+  /* vars que faltaban y quedaban en claro */
+  --darkened-bg: #141414;
+  --selected-bg: #1a1a1a;
+  --selected-row: #1f1a00;
+  --message-success-bg: #14251e;
+  --message-warning-bg: #2a2410;
+  --message-error-bg: #2a1414;
+  --error-fg: #e05a5a;
+  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 body {
@@ -531,5 +545,288 @@ body.login {
   }
   div.breadcrumbs {
     padding: 10px 18px;
+  }
+}
+
+/* ============================================================
+   POLISH — app list, sidebar y detalles del dashboard
+   ============================================================ */
+
+/* fondo con un glow suave arriba, para que no sea negro plano */
+body {
+  background-image:
+    radial-gradient(900px 380px at 12% -180px, rgba(245, 200, 0, 0.09), transparent 70%),
+    radial-gradient(700px 320px at 92% -140px, rgba(245, 200, 0, 0.05), transparent 70%) !important;
+  background-attachment: fixed !important;
+}
+
+/* ---------- Header ---------- */
+#header {
+  background: linear-gradient(180deg, #161616, #101010) !important;
+  border-bottom: 1px solid var(--fa-borde);
+  position: relative;
+}
+#header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--fa-amarillo), transparent);
+  opacity: 0.5;
+}
+#user-tools a {
+  padding: 6px 12px;
+  border: 1px solid #f5c80033;
+  border-radius: 999px;
+  background: #f5c8000f;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+#user-tools a:hover {
+  background: #f5c8001f;
+  border-color: #f5c80066;
+}
+
+/* ---------- Nav sidebar ---------- */
+#nav-sidebar,
+#nav-filter {
+  background: var(--fa-sidebar) !important;
+  border-right: 1px solid var(--fa-borde);
+}
+#nav-filter {
+  border: 1px solid var(--fa-borde) !important;
+  border-radius: 8px;
+  color: var(--fa-texto) !important;
+  margin: 10px;
+  width: calc(100% - 20px);
+}
+#nav-sidebar .current-model {
+  background: #f5c8001a !important;
+  border-left: 2px solid var(--fa-amarillo);
+}
+
+/* ---------- Lista de apps (lo que se veia rustico) ---------- */
+#content-main .module,
+#content-related .module {
+  background: linear-gradient(180deg, #171717, #121212) !important;
+  border: 1px solid var(--fa-borde);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+#content-main .module table,
+#content-related .module table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+/* cabecera de cada app */
+#content-main .module caption,
+#content-main .module caption a.section,
+#content-related .module h2 {
+  background: transparent !important;
+  color: var(--fa-texto) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+}
+#content-main .module caption {
+  background: linear-gradient(180deg, #1d1d1d, #171717) !important;
+  border-bottom: 1px solid var(--fa-borde);
+  padding: 0 !important;
+}
+#content-main .module caption a.section {
+  display: block;
+  padding: 15px 20px 15px 34px !important;
+  position: relative;
+  text-decoration: none;
+}
+/* puntito amarillo antes del nombre de la app */
+#content-main .module caption a.section::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--fa-amarillo);
+  box-shadow: 0 0 10px rgba(245, 200, 0, 0.7);
+}
+#content-main .module caption a.section:hover {
+  color: var(--fa-amarillo) !important;
+}
+
+/* filas de modelos */
+#content-main .module tbody tr {
+  background: transparent !important;
+  border-bottom: 1px solid #1e1e1e;
+  transition: background 0.15s ease;
+}
+#content-main .module tbody tr:last-child {
+  border-bottom: none;
+}
+#content-main .module tbody tr:hover {
+  background: #f5c8000a !important;
+}
+#content-main .module tbody th,
+#content-main .module tbody td {
+  background: transparent !important;
+  border: none !important;
+  padding: 13px 20px !important;
+  vertical-align: middle;
+}
+#content-main .module tbody th {
+  width: 100%;
+  position: relative;
+}
+#content-main .module tbody th a {
+  color: var(--fa-texto) !important;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+#content-main .module tbody tr:hover th a {
+  color: var(--fa-amarillo) !important;
+}
+/* barrita amarilla a la izquierda en hover */
+#content-main .module tbody th::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--fa-amarillo);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+#content-main .module tbody tr:hover th::before {
+  opacity: 1;
+}
+
+/* Add / Change como pills */
+#content-main .module tbody td a.addlink,
+#content-main .module tbody td a.changelink,
+#content-main .module tbody td a.viewlink {
+  display: inline-block;
+  padding: 6px 14px 6px 30px !important;
+  background-position: 11px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 13px 13px !important;
+  border: 1px solid var(--fa-borde);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--fa-texto-suave) !important;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.18s ease;
+}
+#content-main .module tbody td a.addlink:hover,
+#content-main .module tbody td a.changelink:hover,
+#content-main .module tbody td a.viewlink:hover {
+  color: var(--fa-amarillo) !important;
+  border-color: #f5c80066;
+  background-color: #f5c8001a !important;
+}
+#content-main .module tbody td {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* ---------- Recent actions ---------- */
+#content-related {
+  background: transparent !important;
+}
+#content-related .module h2 {
+  background: linear-gradient(180deg, #1d1d1d, #171717) !important;
+  color: var(--fa-amarillo) !important;
+  border-bottom: 1px solid var(--fa-borde);
+  padding: 15px 20px !important;
+}
+#content-related .module h3 {
+  background: transparent !important;
+  color: var(--fa-texto-suave) !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 16px 20px 8px !important;
+  border: none !important;
+  margin: 0;
+}
+#content-related .module p,
+#content-related .module ul {
+  padding: 0 20px 16px !important;
+  margin: 0;
+  color: var(--fa-texto-tenue);
+  font-size: 0.84rem;
+  background: transparent !important;
+}
+#content-related .actionlist li {
+  border-bottom: 1px solid #1e1e1e;
+  padding: 10px 0 !important;
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--fa-texto-suave);
+}
+#content-related .actionlist li:last-child {
+  border-bottom: none;
+}
+
+/* ---------- Stat cards del dashboard ---------- */
+.fa-stat {
+  background: linear-gradient(180deg, #181818, #121212);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.fa-stat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fa-amarillo), transparent);
+  opacity: 0.6;
+}
+.fa-stat:hover {
+  transform: translateY(-2px);
+  border-color: #f5c80055;
+}
+.fa-stat-icon {
+  color: var(--fa-amarillo);
+  border: 1px solid #f5c80033;
+}
+.fa-rank-box,
+.fa-acceso {
+  background: linear-gradient(180deg, #171717, #121212);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+}
+.fa-acceso:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+.fa-rank-item:hover {
+  color: var(--fa-amarillo);
+}
+
+@media (max-width: 767px) {
+  #content-main .module tbody th,
+  #content-main .module tbody td {
+    padding: 11px 14px !important;
+  }
+  #content-main .module caption a.section {
+    padding: 13px 16px 13px 30px !important;
+  }
+  #content-main .module caption a.section::before {
+    left: 16px;
   }
 }

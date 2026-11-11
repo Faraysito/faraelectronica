@@ -17,21 +17,6 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://faraelectronica-backend.onrender.com";
 
-/**
- * Dashboard de estadísticas con gráficos (Recharts).
- *
- * Consume el endpoint que YA existe en el backend: GET /api/estadisticas/
- * (protegido para staff/admin). Convierte esos números en gráficos vistosos.
- *
- * En un portafolio, una pantalla de métricas con gráficos reales es de lo que
- * más impacto genera en una demo. Mantiene la identidad de la web:
- * fondo negro #0a0a0a, dorado #f5c800, Bebas Neue + DM Sans.
- *
- * Colocar en: frontend/src/pages/AdminStats.jsx
- * Requiere: npm install recharts
- * Añadir una ruta protegida en App.jsx, p.ej. <Route path="/admin/stats" .../>
- * (idealmente verificando que el usuario sea admin antes de mostrarla).
- */
 
 const ORO = "#f5c800";
 const VERDE = "#4caf50";

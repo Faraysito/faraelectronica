@@ -1,8 +1,4 @@
-/* ============================================
-   FARA ELECTRÓNICA — Admin estilo Dashboard
-   Estructura tipo "Cash Market" (sidebar + tarjetas + tabla)
-   Paleta: AMARILLO #f5c800 + NEGRO
-   ============================================ */
+/* tema del admin: amarillo #f5c800 + negro, layout tipo dashboard */
 
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
@@ -82,7 +78,7 @@ a:hover {
   color: var(--fa-amarillo-claro);
 }
 
-/* ---------- Header tipo barra superior ---------- */
+/* Header tipo barra superior */
 #header {
   background: var(--fa-sidebar) !important;
   color: var(--fa-texto) !important;
@@ -113,7 +109,7 @@ a:hover {
   border-bottom: none;
 }
 
-/* ---------- Breadcrumbs ---------- */
+/* Breadcrumbs */
 div.breadcrumbs {
   background: var(--fa-sidebar) !important;
   color: var(--fa-texto-suave) !important;
@@ -125,7 +121,7 @@ div.breadcrumbs a {
   color: var(--fa-amarillo);
 }
 
-/* ---------- Layout dashboard ---------- */
+/* Layout dashboard */
 #content {
   padding: 28px 32px;
 }
@@ -159,7 +155,7 @@ h1 {
   color: var(--fa-texto);
 }
 
-/* ---------- Tablas estilo "Recent Orders" ---------- */
+/* Tablas estilo "Recent Orders" */
 table {
   color: var(--fa-texto);
 }
@@ -198,7 +194,7 @@ thead th.sorted {
   color: var(--fa-amarillo);
 }
 
-/* ---------- Filtros ---------- */
+/* Filtros */
 #changelist-filter {
   background: var(--fa-panel) !important;
   border: 1px solid var(--fa-borde);
@@ -223,7 +219,7 @@ thead th.sorted {
   color: var(--fa-amarillo);
 }
 
-/* ---------- Formularios ---------- */
+/* Formularios */
 .form-row {
   border-bottom: 1px solid var(--fa-borde);
 }
@@ -263,7 +259,7 @@ p.help {
   font-size: 0.78rem;
 }
 
-/* ---------- Botones ---------- */
+/* Botones */
 .button,
 input[type="submit"],
 input[type="button"],
@@ -314,7 +310,7 @@ a.deletelink {
   background: var(--fa-amarillo-claro) !important;
 }
 
-/* ---------- Paginación ---------- */
+/* Paginación */
 .paginator a:link,
 .paginator a:visited {
   background: var(--fa-panel);
@@ -330,7 +326,7 @@ a.deletelink {
   font-weight: 700;
 }
 
-/* ---------- Mensajes ---------- */
+/* Mensajes */
 ul.messagelist li {
   font-family: "DM Sans", sans-serif;
   border-radius: 8px;
@@ -343,7 +339,7 @@ ul.messagelist li.error {
   border-left-color: var(--fa-rojo);
 }
 
-/* ---------- Inlines ---------- */
+/* Inlines */
 .inline-group {
   border: 1px solid var(--fa-borde);
   border-radius: 12px;
@@ -362,7 +358,7 @@ ul.messagelist li.error {
   font-weight: 600;
 }
 
-/* ---------- Login ---------- */
+/* Login */
 body.login {
   background: var(--fa-bg) !important;
 }
@@ -384,7 +380,7 @@ body.login {
   padding: 13px !important;
 }
 
-/* ---------- Scrollbar ---------- */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -400,7 +396,7 @@ body.login {
   background: var(--fa-amarillo);
 }
 
-/* ---------- Dashboard de inicio (tarjetas tipo Cash Market) ---------- */
+/* Dashboard de inicio (tarjetas tipo Cash Market) */
 .fa-dash-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -548,9 +544,7 @@ body.login {
   }
 }
 
-/* ============================================================
-   POLISH — app list, sidebar y detalles del dashboard
-   ============================================================ */
+/* ajustes finales: lista de apps, sidebar y dashboard */
 
 /* fondo con un glow suave arriba, para que no sea negro plano */
 body {
@@ -560,7 +554,7 @@ body {
   background-attachment: fixed !important;
 }
 
-/* ---------- Header ---------- */
+/* Header */
 #header {
   background: linear-gradient(180deg, #161616, #101010) !important;
   border-bottom: 1px solid var(--fa-borde);
@@ -588,7 +582,7 @@ body {
   border-color: #f5c80066;
 }
 
-/* ---------- Nav sidebar ---------- */
+/* Nav sidebar */
 #nav-sidebar,
 #nav-filter {
   background: var(--fa-sidebar) !important;
@@ -606,7 +600,7 @@ body {
   border-left: 2px solid var(--fa-amarillo);
 }
 
-/* ---------- Lista de apps (lo que se veia rustico) ---------- */
+/* Lista de apps (lo que se veia rustico) */
 #content-main .module,
 #content-related .module {
   background: linear-gradient(180deg, #171717, #121212) !important;
@@ -741,7 +735,7 @@ body {
   white-space: nowrap;
 }
 
-/* ---------- Recent actions ---------- */
+/* Recent actions */
 #content-related {
   background: transparent !important;
 }
@@ -780,7 +774,7 @@ body {
   border-bottom: none;
 }
 
-/* ---------- Stat cards del dashboard ---------- */
+/* Stat cards del dashboard */
 .fa-stat {
   background: linear-gradient(180deg, #181818, #121212);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);

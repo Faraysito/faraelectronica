@@ -1,16 +1,11 @@
-# Fara Electrónica 🔌
+# Fara Electrónica
 
 Tienda online de **cámaras de seguridad y equipos de calefacción** para una pyme familiar chilena. Catálogo, carrito, pagos reales con Webpay (Transbank), historial de compras y un panel de administración con métricas de rentabilidad.
 
-🔗 **Demo:** https://faraelectronica.vercel.app
-🔗 **API:** https://faraelectronica-backend.onrender.com/api/productos/
+- Demo: https://faraelectronica.vercel.app
+- API: https://faraelectronica-backend.onrender.com/api/productos/
 
-> Reemplaza el bloque de arriba con un GIF o video corto del flujo completo
-> (catálogo → carrito → pago de prueba → historial). Es lo que más convierte en un portafolio.
-
----
-
-## ✨ Características
+## Características
 
 - **Catálogo por categorías** con búsqueda, filtro por precio y ordenamiento.
 - **Carrito persistente** (sobrevive recargas) y siempre visible, con login-gate.
@@ -22,9 +17,7 @@ Tienda online de **cámaras de seguridad y equipos de calefacción** para una py
 - **Panel de administración** con tema propio y **dashboard de estadísticas** (ingresos, utilidad, margen %, ranking de productos) con gráficos.
 - **Responsive** y con modo claro/oscuro.
 
----
-
-## 🧱 Stack
+## Stack
 
 | Capa       | Tecnología                                              |
 | ---------- | ------------------------------------------------------- |
@@ -36,33 +29,13 @@ Tienda online de **cámaras de seguridad y equipos de calefacción** para una py
 | Media      | Cloudinary                                              |
 | Deploy     | Vercel (frontend) · Render (backend)                    |
 
----
+## Arquitectura
 
-## 🏗️ Arquitectura
+- El frontend (React + Vite) está en Vercel y le habla a la API por HTTPS, con JWT en el header.
+- El backend (Django REST) está en Render, con PostgreSQL para los datos y Cloudinary para las imágenes.
+- El login es con Google OAuth y los pagos con Webpay Plus de Transbank.
 
-```
-┌──────────────┐      HTTPS / JSON      ┌──────────────────┐
-│   Frontend   │ ─────────────────────► │     Backend      │
-│  React+Vite  │                        │  Django REST API │
-│   (Vercel)   │ ◄───────────────────── │     (Render)     │
-└──────┬───────┘      JWT Bearer        └────────┬─────────┘
-       │                                         │
-       │ OAuth                          ┌────────┴─────────┐
-       ▼                                ▼                  ▼
-  ┌─────────┐                    ┌─────────────┐   ┌──────────────┐
-  │ Google  │                    │ PostgreSQL  │   │  Transbank   │
-  │  OAuth  │                    │   (datos)   │   │  (Webpay)    │
-  └─────────┘                    └─────────────┘   └──────────────┘
-                                        ▲
-                                 ┌──────┴──────┐
-                                 │  Cloudinary │
-                                 │  (imágenes) │
-                                 └─────────────┘
-```
-
----
-
-## 🚀 Puesta en marcha local
+## Puesta en marcha local
 
 ### Backend
 
@@ -90,9 +63,7 @@ npm run dev
 
 App en `http://localhost:5173`
 
----
-
-## 🧪 Tests
+## Tests
 
 ```bash
 cd backend
@@ -101,18 +72,14 @@ python manage.py test productos
 
 Cubre la lógica de negocio (margen, utilidad, stock), la **seguridad de pagos** (recálculo de precio en servidor, validación de stock) y el aislamiento del historial por usuario.
 
----
-
-## 💳 Pago de prueba (Webpay integración)
+## Pago de prueba (Webpay integración)
 
 Con `DEBUG=True` el SDK usa el ambiente de prueba de Transbank. Tarjeta de test:
 
 - VISA `4051 8856 0044 6623` · CVV `123` · fecha futura cualquiera
 - RUT `11.111.111-1` · clave `123`
 
----
-
-## 📁 Estructura
+## Estructura
 
 ```
 faraelectronica/
@@ -127,15 +94,11 @@ faraelectronica/
         └── pages/           # Home, Camaras, Calefaccion, AdminStats, 404
 ```
 
----
-
-## 👤 Autor
+## Autor
 
 Diseñado y desarrollado por **Diego Farías**
 [Portafolio](https://diegofarias-portafolio.vercel.app/) · [LinkedIn](https://www.linkedin.com/in/diego-ignacio-de-jesus-farias-araya-6927642a8/)
 
----
-
-## 📄 Licencia
+## Licencia
 
 Proyecto privado. © 2026 Fara Electrónica. Todos los derechos reservados.

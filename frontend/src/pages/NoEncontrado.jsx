@@ -1,15 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-/**
- * Página 404 propia, en la identidad de Fara Electrónica.
- *
- * Una SPA sin 404 deja al usuario en blanco cuando escribe una ruta mala.
- * Esto da una salida clara de vuelta al catálogo.
- *
- * Colocar en: frontend/src/pages/NoEncontrado.jsx
- * Añadir como última ruta en App.jsx:
- *   <Route path="*" element={wrap(<NoEncontrado />)} />
- */
 function NoEncontrado() {
   const navigate = useNavigate();
 

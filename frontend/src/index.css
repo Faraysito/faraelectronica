@@ -1,4 +1,4 @@
-/* ===== Variables de tema (dark por defecto, light opcional) ===== */
+/* variables de tema (dark por defecto, light opcional) */
 :root,
 :root[data-tema="dark"] {
   --fondo: #0b0b0b;
@@ -74,7 +74,7 @@ img {
   transform: scale(1.1);
 }
 
-/* ===== Animación: producto volando al carrito ===== */
+/* animación del producto volando al carrito */
 @keyframes volar-carrito {
   0% {
     opacity: 1;
@@ -97,7 +97,7 @@ img {
   animation: volar-carrito 0.8s cubic-bezier(0.5, -0.3, 0.7, 1) forwards;
 }
 
-/* ===== Skeleton loaders ===== */
+/* skeleton loaders */
 @keyframes skeleton-pulse {
   0% {
     background-position: -200% 0;

@@ -1,9 +1,5 @@
 import CatalogoBase from "../components/CatalogoBase";
 
-/**
- * Calefaccion — ahora es solo un wrapper de CatalogoBase.
- * Toda la logica (fetch, carrito, buscador, filtros, orden) vive ahi.
- */
 function Calefaccion() {
   return (
     <CatalogoBase

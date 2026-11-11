@@ -139,14 +139,13 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = 'DENY'
 
-# ── Transbank / Webpay ─────────────────────────────────────────────
-# En DEBUG=True se usan credenciales de PRUEBA (integración) ya incluidas en el SDK.
-# En producción (DEBUG=False) debes definir estas variables de entorno en Render:
-TBK_COMMERCE_CODE = os.getenv('TBK_COMMERCE_CODE')        # tu código de comercio real
-TBK_API_KEY = os.getenv('TBK_API_KEY')                    # tu API key secreta real
+# Transbank / Webpay
+# con DEBUG=True el SDK usa las credenciales de integración; en producción salen del entorno
+TBK_COMMERCE_CODE = os.getenv('TBK_COMMERCE_CODE')
+TBK_API_KEY = os.getenv('TBK_API_KEY')
 
-# URL a la que Webpay redirige tras el pago. Debe apuntar a la página /pago/retorno del frontend.
+# a donde vuelve webpay después de pagar (/pago/retorno del frontend)
 WEBPAY_RETURN_URL = os.getenv(
     'WEBPAY_RETURN_URL',
-    'http://localhost:5173/pago/retorno'  # en local; en prod: https://faraelectronica.vercel.app/pago/retorno
+    'http://localhost:5173/pago/retorno'  # en prod: https://faraelectronica.vercel.app/pago/retorno
 )

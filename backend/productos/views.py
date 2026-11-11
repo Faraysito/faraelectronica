@@ -30,7 +30,7 @@ class NegocioViewSet(viewsets.ModelViewSet):
 
 
 class ProductoViewSet(viewsets.ModelViewSet):
-    """1. INVENTARIO: stock, categorías, SKU, precio por cantidad."""
+    """Inventario: stock, categorías, SKU y precio por cantidad."""
     serializer_class = ProductoSerializer
     permission_classes = [IsAuthenticated]
 
@@ -68,7 +68,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
 
 class OrdenViewSet(viewsets.ModelViewSet):
-    """Órdenes web + presenciales. 1. POS 4. Métodos de pago."""
+    """Órdenes web y ventas presenciales."""
     serializer_class = OrdenSerializer
     permission_classes = [IsAuthenticated]
 
@@ -77,7 +77,7 @@ class OrdenViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def crear_venta_manual(self, request):
-        """1. POS - Registrar venta presencial rápidamente."""
+        """Registra una venta presencial (POS)."""
         datos = request.data
         negocio_id = datos.get('negocio_id')
         items = datos.get('items', [])
@@ -117,7 +117,7 @@ class OrdenViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def registrar_pago(self, request):
-        """4. Métodos de pago - Marcar método de pago de una orden."""
+        """Marca el método de pago de una orden."""
         orden_id = request.data.get('orden_id')
         metodo_pago_id = request.data.get('metodo_pago_id')
         
@@ -129,7 +129,7 @@ class OrdenViewSet(viewsets.ModelViewSet):
 
 
 class GastoViewSet(viewsets.ModelViewSet):
-    """3. INGRESOS/EGRESOS - Libro de caja, registrar gastos."""
+    """Libro de caja: gastos."""
     serializer_class = GastoSerializer
     permission_classes = [IsAuthenticated]
 
@@ -141,7 +141,7 @@ class GastoViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def balance_del_mes(self, request):
-        """3. Balance - Caja del mes actual."""
+        """Balance de caja del mes actual."""
         ahora = now()
         inicio_mes = ahora.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
@@ -199,7 +199,7 @@ class GastoViewSet(viewsets.ModelViewSet):
 
 
 class VentaViewSet(viewsets.ModelViewSet):
-    """1. POS - Ventas presenciales rápidas."""
+    """Ventas presenciales (POS)."""
     serializer_class = VentaSerializer
     permission_classes = [IsAuthenticated]
 
@@ -241,12 +241,12 @@ class VentaViewSet(viewsets.ModelViewSet):
 
 
 class ReportesViewSet(viewsets.ViewSet):
-    """5. REPORTES descargables + estadísticas en tiempo real."""
+    """Reportes descargables y estadísticas."""
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def estadisticas(self, request):
-        """5. Estadísticas en vivo - Dashboard."""
+        """Estadísticas para el dashboard."""
         negocio_id = request.query_params.get('negocio_id')
         
         # Filtrar por negocio si se proporciona
@@ -280,7 +280,7 @@ class ReportesViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'])
     def descargar_csv(self, request):
-        """5. Reportes - Descargar en CSV."""
+        """Descarga de reportes en CSV."""
         reporte_tipo = request.query_params.get('tipo', 'ordenes')
         negocio_id = request.query_params.get('negocio_id')
         
@@ -334,13 +334,13 @@ class ReportesViewSet(viewsets.ViewSet):
 
 
 class FacturaViewSet(viewsets.ModelViewSet):
-    """7. FACTURACIÓN SII - Boletas/Facturas electrónicas."""
+    """Boletas y facturas electrónicas (SII)."""
     serializer_class = FacturaSerializer
     permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['post'])
     def generar_boleta(self, request):
-        """7. Generar boleta de orden o venta."""
+        """Genera la boleta de una orden o venta."""
         orden_id = request.data.get('orden_id')
         venta_id = request.data.get('venta_id')
         tipo = request.data.get('tipo', 'boleta')
@@ -367,7 +367,7 @@ class FacturaViewSet(viewsets.ModelViewSet):
         """Enviar factura al SII (requiere integración externa)."""
         factura = self.get_object()
         
-        # Placeholder: aquí irá la integración con LibreDTE o similar
+        # TODO: integrar con LibreDTE o similar
         factura.estado = 'enviada'
         factura.save()
         
@@ -379,7 +379,7 @@ class FacturaViewSet(viewsets.ModelViewSet):
 
 
 def estadisticas(request):
-    """Endpoint existente, ahora mejorado."""
+    """Estadísticas del dashboard del admin."""
     negocio_id = request.query_params.get('negocio_id')
     
     # Misma lógica que en ReportesViewSet.estadisticas
@@ -400,7 +400,7 @@ def estadisticas(request):
     })
 
 
-# ── Webpay (Transbank) ─────────────────────────────────────────────
+# Webpay (Transbank)
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser

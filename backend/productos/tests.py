@@ -1,18 +1,3 @@
-"""
-Tests del backend de Fara Electrónica.
-
-Cubre lo que más importa demostrar en un portafolio:
-  1. Lógica de negocio (margen, utilidad, agotado).
-  2. Seguridad: el precio se recalcula SIEMPRE en el servidor (nadie paga menos editando el JS).
-  3. Validación de stock antes de permitir una compra.
-  4. El costo NUNCA se expone en la API pública.
-  5. El historial solo devuelve órdenes del usuario logueado.
-
-Colocar en: backend/productos/tests.py  (reemplaza el archivo vacío actual)
-
-Ejecutar:
-    python manage.py test productos
-"""
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -24,9 +9,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Producto, Orden, OrdenItem
 
 
-# ─────────────────────────────────────────────────────────────────
-#  1. Lógica de negocio en el modelo Producto
-# ─────────────────────────────────────────────────────────────────
 class ProductoModeloTests(APITestCase):
     def test_margen_unitario(self):
         p = Producto(nombre="Cam", precio=10000, costo=6000, stock=5)
@@ -49,9 +31,6 @@ class ProductoModeloTests(APITestCase):
         self.assertFalse(p.agotado)
 
 
-# ─────────────────────────────────────────────────────────────────
-#  2. Lógica de la orden (utilidad)
-# ─────────────────────────────────────────────────────────────────
 class OrdenModeloTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="u@test.com", email="u@test.com")
@@ -78,9 +57,6 @@ class OrdenModeloTests(APITestCase):
         self.assertEqual(item.subtotal, 60000)
 
 
-# ─────────────────────────────────────────────────────────────────
-#  3. API pública de productos
-# ─────────────────────────────────────────────────────────────────
 class ProductoAPITests(APITestCase):
     def setUp(self):
         self.prod = Producto.objects.create(
@@ -117,9 +93,6 @@ class ProductoAPITests(APITestCase):
         self.assertIn("agotado", res.json()[0])
 
 
-# ─────────────────────────────────────────────────────────────────
-#  4. Seguridad de pagos: recálculo en servidor + validación de stock
-# ─────────────────────────────────────────────────────────────────
 class WebpaySeguridadTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="c@test.com", email="c@test.com")
@@ -185,9 +158,6 @@ class WebpaySeguridadTests(APITestCase):
         self.assertEqual(res.status_code, 400)
 
 
-# ─────────────────────────────────────────────────────────────────
-#  5. Historial: solo órdenes del usuario logueado
-# ─────────────────────────────────────────────────────────────────
 class HistorialTests(APITestCase):
     def setUp(self):
         self.user_a = User.objects.create_user(username="a@test.com", email="a@test.com")
@@ -213,9 +183,6 @@ class HistorialTests(APITestCase):
         self.assertIn(res.status_code, (401, 403))
 
 
-# ─────────────────────────────────────────────────────────────────
-#  6. Estadísticas: solo admin
-# ─────────────────────────────────────────────────────────────────
 class EstadisticasTests(APITestCase):
     def setUp(self):
         self.normal = User.objects.create_user(username="n@test.com", email="n@test.com")

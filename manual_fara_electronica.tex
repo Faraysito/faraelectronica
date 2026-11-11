@@ -1,6 +1,6 @@
 \documentclass[11pt,a4paper]{article}
 
-% ===== Paquetes =====
+% Paquetes
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
@@ -13,12 +13,12 @@
 \usepackage{tcolorbox}
 \usepackage{hyperref}
 
-% ===== Colores de marca =====
+% Colores de marca
 \definecolor{faramarillo}{HTML}{E0A200}
 \definecolor{faranegro}{HTML}{0A0A0A}
 \definecolor{faragris}{HTML}{555555}
 
-% ===== Enlaces =====
+% Enlaces
 \hypersetup{
   colorlinks=true,
   linkcolor=faramarillo,
@@ -26,7 +26,7 @@
   citecolor=faramarillo
 }
 
-% ===== Títulos =====
+% Títulos
 \titleformat{\section}
   {\color{faranegro}\Large\bfseries}
   {\thesection.}{0.5em}{}
@@ -34,7 +34,7 @@
   {\color{faramarillo}\large\bfseries}
   {\thesubsection}{0.5em}{}
 
-% ===== Encabezado y pie =====
+% Encabezado y pie
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{\textcolor{faramarillo}{\textbf{FARA ELECTRÓNICA}}}
@@ -42,7 +42,7 @@
 \cfoot{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
-% ===== Caja de nota =====
+% Caja de nota
 \newtcolorbox{nota}{
   colback=faramarillo!8,
   colframe=faramarillo,
@@ -53,7 +53,7 @@
 
 \begin{document}
 
-% ===== Portada =====
+% Portada
 \begin{titlepage}
   \centering
   \vspace*{3cm}
@@ -70,9 +70,7 @@
 \tableofcontents
 \newpage
 
-% =====================================================
 \section{Introducción}
-% =====================================================
 
 Este documento explica cómo usar la tienda en línea de \textbf{Fara Electrónica},
 tanto desde el punto de vista del \textbf{cliente} (la persona que compra) como del
@@ -94,9 +92,7 @@ La plataforma permite:
 El contacto por WhatsApp no requiere iniciar sesión.
 \end{nota}
 
-% =====================================================
 \section{Guía para el Cliente}
-% =====================================================
 
 \subsection{Iniciar sesión}
 
@@ -169,9 +165,7 @@ productos, el estado (pagada, preparando, entregada, etc.) y el total.
 En la esquina inferior derecha hay un botón con un \textbf{sol/luna} que permite cambiar
 entre el modo oscuro y el modo claro de la página, según tu preferencia.
 
-% =====================================================
 \section{Guía para el Administrador}
-% =====================================================
 
 \subsection{Acceder al panel}
 
@@ -247,9 +241,7 @@ Para agregar una categoría nueva de productos se requiere una pequeña modifica
 código (en el archivo de modelos del backend) y volver a desplegar. Consulta con quien
 mantiene el sistema para hacerlo de forma segura.
 
-% =====================================================
 \section{Preguntas frecuentes}
-% =====================================================
 
 \textbf{¿Es seguro pagar con Webpay?}\\
 Sí. El pago se procesa en el portal oficial de Transbank; la tienda nunca ve ni guarda

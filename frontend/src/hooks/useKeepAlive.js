@@ -4,22 +4,8 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://faraelectronica-backend.onrender.com";
 
-/**
- * useKeepAlive
- *
- * El backend en Render (plan free) se duerme tras ~15 min de inactividad y
- * tarda ~50s en despertar. En una demo de portafolio eso se ve como si la
- * página estuviera rota. Este hook hace un "ping" apenas carga la app para
- * empezar a despertar el servidor cuanto antes, y expone el estado para que
- * la UI pueda avisar al usuario en vez de mostrar una pantalla vacía.
- *
- * Uso:
- *   const { despierto, despertando } = useKeepAlive();
- *
- * Devuelve:
- *   despierto    -> true cuando el backend respondió.
- *   despertando  -> true mientras se espera la primera respuesta.
- */
+// el backend en render (plan free) se duerme a los ~15 min y tarda ~50s en despertar.
+// lo despierto apenas carga la app y lo mantengo vivo mientras la pestaña siga abierta.
 export function useKeepAlive() {
   const [despierto, setDespierto] = useState(false);
   const [despertando, setDespertando] = useState(true);

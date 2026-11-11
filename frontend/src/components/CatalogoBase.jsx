@@ -10,29 +10,6 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://faraelectronica-backend.onrender.com";
 
-/**
- * CatalogoBase — página de catálogo reutilizable.
- *
- * Reemplaza la lógica duplicada de Camaras.jsx y Calefaccion.jsx con un solo
- * componente, y AÑADE lo que faltaba: buscador por texto, filtro por precio,
- * imágenes con lazy-load, y aviso de "servidor despertando" (cold-start de Render).
- *
- * Colocar en: frontend/src/components/CatalogoBase.jsx
- *
- * Camaras.jsx pasa a ser solo:
- *   import CatalogoBase from "../components/CatalogoBase";
- *   export default function Camaras() {
- *     return (
- *       <CatalogoBase
- *         categoria="camaras"
- *         titulo={<>Cámaras de <span>Seguridad</span></>}
- *         subtitulo="Vigilancia profesional para tu hogar y negocio"
- *       />
- *     );
- *   }
- *
- * Y Calefaccion.jsx igual, con categoria="calefaccion".
- */
 function CatalogoBase({ categoria, titulo, subtitulo }) {
   const [productos, setProductos] = useState([]);
   const [seleccionado, setSeleccionado] = useState(null);

@@ -31,7 +31,7 @@ function Navbar() {
     setUsuario(null);
   };
 
-  // El carrito está SIEMPRE visible. Si no hay sesión, al hacer click pedimos login.
+  // sin sesión, el carrito abre el login
   const handleClickCarrito = () => {
     if (usuario) {
       setMostrarCarrito(true);
@@ -256,7 +256,6 @@ function Navbar() {
                 </button>
               )}
 
-              {/* Carrito: SIEMPRE visible (logueado o no) */}
               <button
                 className="btn-icono"
                 onClick={handleClickCarrito}

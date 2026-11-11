@@ -1,28 +1,5 @@
 import { useMemo, useState } from "react";
 
-/**
- * useFiltroProductos
- *
- * Añade búsqueda por texto y filtro por rango de precio sobre la lista de
- * productos que ya cargan Camaras.jsx / Calefaccion.jsx. Hoy esas páginas
- * solo tienen "ordenar"; esto agrega el buscador que falta para sentirse
- * una tienda completa.
- *
- * Colocar en: frontend/src/hooks/useFiltroProductos.js
- *
- * Uso dentro de una página de catálogo:
- *
- *   const {
- *     busqueda, setBusqueda,
- *     precioMax, setPrecioMax,
- *     orden, setOrden,
- *     productosFiltrados,
- *     precioTope,
- *   } = useFiltroProductos(productos);
- *
- *   <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar..." />
- *   ...mapear productosFiltrados igual que antes.
- */
 export function useFiltroProductos(productos = []) {
   const [busqueda, setBusqueda] = useState("");
   const [orden, setOrden] = useState("defecto");

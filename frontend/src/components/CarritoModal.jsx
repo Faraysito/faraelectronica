@@ -1,14 +1,20 @@
 import { useState } from "react";
 import { useCarrito } from "../context/CarritoContext";
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://faraelectronica-backend.onrender.com";
+import { TIENDA } from "../config/tienda";
+import { useTiendaConfig } from "../hooks/useTiendaConfig";
+import { pagarConWebpay } from "../lib/checkout";
+import { claveLinea } from "../lib/carrito";
+import { totalLinea } from "../lib/precios";
+import { datosProducto, track } from "../lib/metaPixel";
+import EnvioGratisBarra from "./EnvioGratisBarra";
+import UpsellCarrito from "./UpsellCarrito";
 
 const WSP_NUMERO = "56940261248";
 
 function CarritoModal({ onClose }) {
-  const { carrito, quitarDelCarrito, cambiarCantidad, total } = useCarrito();
+  const { carrito, agregarAlCarrito, quitarDelCarrito, cambiarCantidad, total } =
+    useCarrito();
+  const config = useTiendaConfig();
   const [pagando, setPagando] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,50 +22,18 @@ function CarritoModal({ onClose }) {
     if (carrito.length === 0) return;
     setPagando(true);
     setError(null);
-
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      setError("Debes iniciar sesión para pagar.");
-      setPagando(false);
-      return;
-    }
-
     try {
-      const res = await fetch(`${API_URL}/api/webpay/crear/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          items: carrito.map((p) => ({ id: p.id, cantidad: p.cantidad })),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "No se pudo iniciar el pago.");
-        setPagando(false);
-        return;
-      }
-
-      // Webpay funciona enviando un POST con el token a su URL.
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = data.url;
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "token_ws";
-      input.value = data.token;
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
+      // el backend recalcula combos/suscripción y crea la orden
+      await pagarConWebpay(carrito);
     } catch (err) {
-      console.error(err);
-      setError("Error de conexión con el servidor.");
+      setError(err.message);
       setPagando(false);
     }
+  };
+
+  const agregarUpsell = (producto) => {
+    agregarAlCarrito(producto);
+    track("AddToCart", datosProducto(producto));
   };
 
   // Comprar directo con el vendedor por WhatsApp
@@ -68,7 +42,7 @@ function CarritoModal({ onClose }) {
     const lista = carrito
       .map(
         (p) =>
-          `• ${p.nombre} x${p.cantidad} ($${(p.precio * p.cantidad).toLocaleString("es-CL")})`,
+          `• ${p.nombre} x${p.cantidad} ($${totalLinea(p).toLocaleString("es-CL")})${p.suscripcion ? ` - suscripción cada ${p.frecuencia_dias} días` : ""}`,
       )
       .join("\n");
     const mensaje = encodeURIComponent(
@@ -126,6 +100,7 @@ function CarritoModal({ onClose }) {
         .btn-cerrar-carrito:hover { border-color: #555; color: #aaa; }
         .carrito-vacio { text-align: center; padding: 40px 0; color: #555; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; }
         .carrito-vacio-icon { font-size: 3rem; margin-bottom: 12px; }
+        .carrito-item-sus { display: inline-block; margin-top: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.66rem; font-weight: 600; color: #4caf50; border: 1px solid #4caf5066; border-radius: 20px; padding: 2px 8px; }
       `}</style>
 
       <div className="carrito-box" onClick={(e) => e.stopPropagation()}>
@@ -141,7 +116,7 @@ function CarritoModal({ onClose }) {
             </div>
           ) : (
             carrito.map((p) => (
-              <div className="carrito-item" key={p.id}>
+              <div className="carrito-item" key={claveLinea(p)}>
                 <img
                   src={p.imagen_principal}
                   alt={p.nombre}
@@ -150,26 +125,32 @@ function CarritoModal({ onClose }) {
                 <div className="carrito-item-info">
                   <p className="carrito-item-nombre">{p.nombre}</p>
                   <p className="carrito-item-precio">
-                    ${(p.precio * p.cantidad).toLocaleString("es-CL")}
+                    ${totalLinea(p).toLocaleString("es-CL")}
                   </p>
+                  {p.suscripcion && (
+                    <span className="carrito-item-sus">
+                      Suscripción c/{p.frecuencia_dias} días
+                      {p.pct_suscripcion ? ` · -${p.pct_suscripcion}%` : ""}
+                    </span>
+                  )}
                 </div>
                 <div className="carrito-item-controles">
                   <button
                     className="ctrl-btn"
-                    onClick={() => cambiarCantidad(p.id, p.cantidad - 1)}
+                    onClick={() => cambiarCantidad(claveLinea(p), p.cantidad - 1)}
                   >
                     −
                   </button>
                   <span className="ctrl-cantidad">{p.cantidad}</span>
                   <button
                     className="ctrl-btn"
-                    onClick={() => cambiarCantidad(p.id, p.cantidad + 1)}
+                    onClick={() => cambiarCantidad(claveLinea(p), p.cantidad + 1)}
                   >
                     +
                   </button>
                   <button
                     className="ctrl-eliminar"
-                    onClick={() => quitarDelCarrito(p.id)}
+                    onClick={() => quitarDelCarrito(claveLinea(p))}
                   >
                     ✕
                   </button>
@@ -177,9 +158,15 @@ function CarritoModal({ onClose }) {
               </div>
             ))
           )}
+          {carrito.length > 0 && TIENDA.secciones.upsell && (
+            <UpsellCarrito carrito={carrito} onAgregar={agregarUpsell} />
+          )}
         </div>
 
         <div className="carrito-footer">
+          {carrito.length > 0 && TIENDA.secciones.envioGratis && (
+            <EnvioGratisBarra subtotal={total} umbral={config.envio.gratis_desde} />
+          )}
           {error && <div className="carrito-error">⚠️ {error}</div>}
           <div className="carrito-total">
             <span className="carrito-total-label">TOTAL</span>

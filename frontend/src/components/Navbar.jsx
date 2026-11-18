@@ -16,6 +16,13 @@ function Navbar() {
 
   const enCatalogo =
     location.pathname === "/camaras" || location.pathname === "/calefaccion";
+  const enProducto = location.pathname.startsWith("/producto/");
+
+  // desde la página de producto vuelve a donde venía (si llegó directo, al inicio)
+  const volver = () => {
+    if (enProducto && window.history.state?.idx > 0) navigate(-1);
+    else navigate("/");
+  };
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -222,8 +229,8 @@ function Navbar() {
 
       <div className="nav-island-container">
         <div className="nav-wrapper">
-          {enCatalogo && (
-            <button className="btn-volver" onClick={() => navigate("/")}>
+          {(enCatalogo || enProducto) && (
+            <button className="btn-volver" onClick={volver}>
               ←
             </button>
           )}

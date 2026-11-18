@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
     Producto, ProductoImagen, Orden, OrdenItem, Gasto, Venta, VentaItem,
-    MetodoPago, Negocio, FacturaElectronica, PrecioEscalonado
+    MetodoPago, Negocio, FacturaElectronica, PrecioEscalonado, Resena, Suscripcion
 )
 
 
@@ -21,6 +21,8 @@ class ProductoImagenInline(admin.TabularInline):
 class PrecioEscalonadoInline(admin.TabularInline):
     model = PrecioEscalonado
     extra = 1
+    verbose_name = 'Combo / precio por cantidad'
+    verbose_name_plural = 'Combos x2, x3... (precio unitario por cantidad)'
 
 
 @admin.register(Producto)
@@ -37,7 +39,13 @@ class ProductoAdmin(admin.ModelAdmin):
         ('Precios y Rentabilidad', {
             'fields': ('precio', 'costo', 'stock'),
         }),
+        ('Página de producto', {
+            'fields': ('titular', 'especificaciones', 'modo_uso', 'ficha_tecnica_url', 'certificaciones',
+                       'permite_suscripcion', 'complementos'),
+            'classes': ('collapse',),
+        }),
     )
+    filter_horizontal = ('complementos',)
 
     def margen_col(self, obj):
         color = '#4caf50' if obj.margen_porcentaje >= 30 else ('#f5c800' if obj.margen_porcentaje >= 10 else '#ff6b6b')
@@ -57,8 +65,10 @@ class OrdenItemInline(admin.TabularInline):
     model = OrdenItem
     extra = 0
     can_delete = False
-    readonly_fields = ('nombre_producto', 'precio_unitario', 'costo_unitario', 'cantidad', 'subtotal')
-    fields = ('nombre_producto', 'precio_unitario', 'costo_unitario', 'cantidad', 'subtotal')
+    readonly_fields = ('nombre_producto', 'precio_unitario', 'costo_unitario', 'cantidad', 'subtotal',
+                       'es_suscripcion', 'frecuencia_dias')
+    fields = ('nombre_producto', 'precio_unitario', 'costo_unitario', 'cantidad', 'subtotal',
+              'es_suscripcion', 'frecuencia_dias')
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -68,7 +78,7 @@ class OrdenItemInline(admin.TabularInline):
 class OrdenAdmin(admin.ModelAdmin):
     inlines = [OrdenItemInline]
     list_display = ('id', 'usuario', 'tipo_venta', 'total_col', 'utilidad_col', 'estado_col', 'metodo_pago', 'created_at')
-    list_filter = ('estado', 'tipo_venta', 'created_at')
+    list_filter = ('estado', 'tipo_venta', 'envio_gratis', 'created_at')
     search_fields = ('usuario__email', 'buy_order')
     readonly_fields = ('usuario', 'total', 'buy_order', 'costo_total', 'utilidad', 'created_at', 'updated_at')
 
@@ -138,3 +148,19 @@ class FacturaAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'tipo', 'created_at')
     search_fields = ('numero',)
     readonly_fields = ('numero', 'xml_dte', 'respuesta_sii')
+
+
+@admin.register(Resena)
+class ResenaAdmin(admin.ModelAdmin):
+    list_display = ('producto', 'autor_publico', 'calificacion', 'compra_verificada', 'visible', 'created_at')
+    list_filter = ('visible', 'calificacion', 'compra_verificada')
+    list_editable = ('visible',)
+    search_fields = ('producto__nombre', 'usuario__email', 'comentario')
+    readonly_fields = ('producto', 'usuario', 'calificacion', 'titulo', 'comentario', 'foto', 'compra_verificada', 'created_at')
+
+
+@admin.register(Suscripcion)
+class SuscripcionAdmin(admin.ModelAdmin):
+    list_display = ('nombre_producto', 'usuario', 'cantidad', 'frecuencia_dias', 'descuento_pct', 'proxima_fecha', 'activa')
+    list_filter = ('activa', 'frecuencia_dias')
+    search_fields = ('usuario__email', 'nombre_producto')

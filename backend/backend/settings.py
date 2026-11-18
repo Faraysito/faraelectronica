@@ -149,3 +149,44 @@ WEBPAY_RETURN_URL = os.getenv(
     'WEBPAY_RETURN_URL',
     'http://localhost:5173/pago/retorno'  # en prod: https://faraelectronica.vercel.app/pago/retorno
 )
+
+# ── Tienda: todo editable por variables de entorno ──────────────────
+def _env_int(nombre, defecto):
+    try:
+        return int(os.getenv(nombre, defecto))
+    except (TypeError, ValueError):
+        return defecto
+
+
+def _env_combos(valor):
+    """'2:10,3:15' -> {2: 10, 3: 15} (cantidad: % de descuento por unidad)."""
+    combos = {}
+    for par in (valor or '').split(','):
+        cantidad, _, pct = par.partition(':')
+        if cantidad.strip().isdigit() and pct.strip().isdigit():
+            combos[int(cantidad)] = int(pct)
+    return combos
+
+
+# combos globales x2/x3; vacío = solo los precios escalonados que se carguen en el admin
+COMBO_DESCUENTOS = _env_combos(os.getenv('COMBO_DESCUENTOS', ''))
+# suscríbete y ahorra: % de descuento (0 = apagada) y frecuencias permitidas en días
+SUSCRIPCION_DESCUENTO_PCT = _env_int('SUSCRIPCION_DESCUENTO_PCT', 10)
+SUSCRIPCION_FRECUENCIAS = [
+    int(x) for x in os.getenv('SUSCRIPCION_FRECUENCIAS', '30,60,90').split(',') if x.strip().isdigit()
+]
+# envío gratis desde este total (0 = sin barra de envío gratis)
+ENVIO_GRATIS_DESDE = _env_int('ENVIO_GRATIS_DESDE', 50000)
+# url pública del front (links de los correos de recompra)
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+
+# Meta Conversions API: sin pixel + token no se manda nada
+META_PIXEL_ID = os.getenv('META_PIXEL_ID', '')
+META_CAPI_TOKEN = os.getenv('META_CAPI_TOKEN', '')
+META_TEST_EVENT_CODE = os.getenv('META_TEST_EVENT_CODE', '')
+META_GRAPH_VERSION = os.getenv('META_GRAPH_VERSION', 'v26.0')
+META_CAPI_ASYNC = True
+
+# Klaviyo server-side (eventos para el flow de recordatorio de suscripción)
+KLAVIYO_PRIVATE_KEY = os.getenv('KLAVIYO_PRIVATE_KEY', '')
+KLAVIYO_REVISION = os.getenv('KLAVIYO_REVISION', '2026-07-15')

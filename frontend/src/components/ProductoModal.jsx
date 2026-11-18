@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 
 // Traduce el stock a texto + color para el badge del modal.
 const infoStock = (stock) => {
@@ -230,6 +231,28 @@ const ProductoModal = ({ producto, onClose }) => {
           >
             Pasa el cursor sobre la imagen para ampliar.
           </p>
+
+          <Link
+            to={`/producto/${producto.id}`}
+            onClick={onClose}
+            style={{
+              display: "block",
+              textAlign: "center",
+              background: "#f5c800",
+              color: "#000",
+              padding: "12px",
+              borderRadius: "6px",
+              marginBottom: "10px",
+              fontFamily: "DM Sans, sans-serif",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              textDecoration: "none",
+            }}
+          >
+            Ver página completa →
+          </Link>
 
           <button
             onClick={onClose}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Negocio(models.Model):
@@ -38,6 +39,16 @@ class Producto(models.Model):
     descripcion_larga = models.TextField(null=True, blank=True)
     imagen_principal = models.ImageField(upload_to='productos/')
     categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default='camaras')
+
+    # página de producto (todo opcional, se edita en el admin)
+    titular = models.CharField(max_length=140, blank=True, default='', help_text="Titular con el resultado. Vacío = el de la categoría")
+    especificaciones = models.TextField(blank=True, default='', help_text="Una por línea, formato 'Nombre: valor'")
+    modo_uso = models.TextField(blank=True, default='', help_text="Instalación / modo de uso")
+    ficha_tecnica_url = models.URLField(blank=True, default='', help_text="Link a ficha técnica, manual o certificado")
+    certificaciones = models.TextField(blank=True, default='', help_text="Solo certificaciones reales del producto, una por línea (ej: SEC)")
+    permite_suscripcion = models.BooleanField(default=True, help_text="Mostrar 'Suscríbete y ahorra' en este producto")
+    complementos = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='complemento_de', help_text="Se ofrecen como upsell en el carrito")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -128,6 +139,7 @@ class Orden(models.Model):
     payment_type_code = models.CharField(max_length=8, null=True, blank=True)
     numero_boleta = models.CharField(max_length=20, null=True, blank=True)
     dte_enviado = models.BooleanField(default=False)
+    envio_gratis = models.BooleanField(default=False, help_text="El subtotal superó ENVIO_GRATIS_DESDE al momento de pagar")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -153,6 +165,8 @@ class OrdenItem(models.Model):
     precio_unitario = models.IntegerField()
     costo_unitario = models.IntegerField(default=0)
     cantidad = models.IntegerField(default=1)
+    es_suscripcion = models.BooleanField(default=False)
+    frecuencia_dias = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre_producto} x{self.cantidad}"
@@ -271,3 +285,57 @@ class FacturaElectronica(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} #{self.numero}"
+
+
+class Resena(models.Model):
+    """Reseña de un cliente con compra pagada del producto (estrellas + texto + foto opcional)."""
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='resenas')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resenas')
+    calificacion = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    titulo = models.CharField(max_length=80, blank=True, default='')
+    comentario = models.TextField(max_length=1000)
+    foto = models.ImageField(upload_to='resenas/', null=True, blank=True)
+    compra_verificada = models.BooleanField(default=False)
+    visible = models.BooleanField(default=True, help_text="Desmarca para ocultar spam u ofensas")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(fields=['producto', 'usuario'], name='una_resena_por_usuario_y_producto'),
+        ]
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.calificacion}★"
+
+    @property
+    def autor_publico(self):
+        """'Ana Pérez' -> 'Ana P.' (nunca se expone el correo)."""
+        partes = (self.usuario.first_name or '').split()
+        if not partes:
+            return 'Cliente'
+        if len(partes) == 1:
+            return partes[0]
+        return f"{partes[0]} {partes[1][0]}."
+
+
+class Suscripcion(models.Model):
+    """Suscríbete y ahorra: sin cobro automático, se recuerda la recompra (Klaviyo)."""
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='suscripciones')
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True, related_name='suscripciones')
+    nombre_producto = models.CharField(max_length=100)
+    cantidad = models.PositiveIntegerField(default=1)
+    frecuencia_dias = models.PositiveSmallIntegerField(default=30)
+    descuento_pct = models.PositiveSmallIntegerField(default=0)
+    activa = models.BooleanField(default=True)
+    proxima_fecha = models.DateField()
+    recordatorio_enviado_para = models.DateField(null=True, blank=True)
+    orden_origen = models.ForeignKey(Orden, on_delete=models.SET_NULL, null=True, blank=True, related_name='suscripciones_creadas')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['proxima_fecha']
+
+    def __str__(self):
+        return f"{self.nombre_producto} c/{self.frecuencia_dias} días - {self.usuario.email}"

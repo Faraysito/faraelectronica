@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../context/CarritoContext";
+import { datosConfirmacion } from "../lib/checkout";
+import { track } from "../lib/metaPixel";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -29,7 +31,8 @@ function PagoRetorno() {
     fetch(`${API_URL}/api/webpay/confirmar/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token_ws: token }),
+      // _fbp/_fbc van al backend para la Conversions API de Meta
+      body: JSON.stringify(datosConfirmacion(token)),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -37,6 +40,20 @@ function PagoRetorno() {
           setEstado("pagada");
           setOrdenId(data.orden_id);
           vaciarCarrito();
+          const items = data.items || [];
+          // mismo event_id que manda el backend -> Meta lo cuenta una vez
+          track(
+            "Purchase",
+            {
+              currency: "CLP",
+              value: data.total,
+              content_type: "product",
+              content_ids: items.map((i) => String(i.id)),
+              contents: items.map((i) => ({ id: String(i.id), quantity: i.cantidad })),
+              num_items: items.reduce((acc, i) => acc + i.cantidad, 0),
+            },
+            `purchase-${data.orden_id}`,
+          );
         } else if (data.estado === "rechazada") {
           setEstado("rechazada");
         } else {

@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Sitemap básico para SEO. Colocar en: frontend/public/sitemap.xml
-  Actualiza <lastmod> cuando hagas cambios importantes.
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://faraelectronica.vercel.app/</loc>

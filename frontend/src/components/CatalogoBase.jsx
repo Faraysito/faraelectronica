@@ -3,7 +3,9 @@ import ProductoModal from "./ProductoModal";
 import CarritoModal from "./CarritoModal";
 import CompraModal from "./CompraModal";
 import LoginModal from "./LoginModal";
+import Estrellas from "./producto/Estrellas";
 import { useCarrito } from "../context/CarritoContext";
+import { datosProducto, track } from "../lib/metaPixel";
 import { useFiltroProductos } from "../hooks/useFiltroProductos";
 
 const API_URL =
@@ -86,6 +88,7 @@ function CatalogoBase({ categoria, titulo, subtitulo }) {
     }
     volarAlCarrito(e, producto);
     agregarAlCarrito(producto);
+    track("AddToCart", datosProducto(producto));
     setAgregados((p) => ({ ...p, [producto.id]: true }));
     setTimeout(
       () => setAgregados((p) => ({ ...p, [producto.id]: false })),
@@ -312,6 +315,15 @@ function CatalogoBase({ categoria, titulo, subtitulo }) {
               </div>
               <div className="prod-body">
                 <h2 className="prod-nombre">{p.nombre}</h2>
+                {p.rating_total > 0 && (
+                  <div style={{ margin: "-2px 0 10px" }}>
+                    <Estrellas
+                      valor={p.rating_promedio}
+                      total={p.rating_total}
+                      tamano="sm"
+                    />
+                  </div>
+                )}
                 <p className="prod-desc">{p.descripcion}</p>
                 <div className="prod-footer">
                   <p className="prod-precio">

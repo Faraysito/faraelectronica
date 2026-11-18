@@ -74,6 +74,11 @@ img {
   transform: scale(1.1);
 }
 
+/* con la barra de compra fija abierta, el botón de tema sube para no taparla */
+body.barra-fija-activa .theme-toggle {
+  bottom: 96px;
+}
+
 /* animación del producto volando al carrito */
 @keyframes volar-carrito {
   0% {

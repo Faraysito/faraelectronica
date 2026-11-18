@@ -1,9 +1,7 @@
 import { useState } from "react";
 import LoginModal from "./LoginModal";
-
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "https://faraelectronica-backend.onrender.com";
+import { pagarConWebpay } from "../lib/checkout";
+import { precioUnitario } from "../lib/precios";
 
 const WSP_NUMERO = "56940261248";
 
@@ -14,7 +12,9 @@ function CompraModal({ producto, onClose }) {
   const [error, setError] = useState(null);
 
   const hayUsuario = () => !!localStorage.getItem("user");
-  const totalLinea = (producto.precio || 0) * cantidad;
+  // con combos (tramos) el unitario baja según la cantidad; el backend cobra lo mismo
+  const unitario = precioUnitario(producto, cantidad);
+  const totalLinea = unitario * cantidad;
 
   const bajar = () => setCantidad((c) => Math.max(1, c - 1));
   const subir = () => setCantidad((c) => c + 1);
@@ -26,35 +26,10 @@ function CompraModal({ producto, onClose }) {
       return;
     }
     setPagando(true);
-    const token = localStorage.getItem("access_token");
     try {
-      const res = await fetch(`${API_URL}/api/webpay/crear/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ items: [{ id: producto.id, cantidad }] }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "No se pudo iniciar el pago.");
-        setPagando(false);
-        return;
-      }
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = data.url;
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "token_ws";
-      input.value = data.token;
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
+      await pagarConWebpay([{ id: producto.id, cantidad }]);
     } catch (err) {
-      console.error(err);
-      setError("Error de conexión con el servidor.");
+      setError(err.message);
       setPagando(false);
     }
   };
@@ -129,6 +104,11 @@ function CompraModal({ producto, onClose }) {
             ${totalLinea.toLocaleString("es-CL")}
           </span>
         </div>
+        {unitario < (producto.precio || 0) && (
+          <p className="webpay-nota" style={{ marginTop: -12 }}>
+            Precio combo: ${unitario.toLocaleString("es-CL")} c/u
+          </p>
+        )}
 
         {error && <div className="compra-error">⚠️ {error}</div>}
 
@@ -159,7 +139,11 @@ function CompraModal({ producto, onClose }) {
       {mostrarLogin && (
         <LoginModal
           onClose={() => setMostrarLogin(false)}
-          onLoginSuccess={() => setMostrarLogin(false)}
+          onLoginSuccess={() => {
+            // pago express: después del login sigue directo a Webpay
+            setMostrarLogin(false);
+            handleWebpay();
+          }}
         />
       )}
     </div>

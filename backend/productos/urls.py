@@ -18,4 +18,7 @@ urlpatterns = [
     path('webpay/crear/', views.webpay_crear, name='webpay-crear'),
     path('webpay/confirmar/', views.webpay_confirmar, name='webpay-confirmar'),
     path('historial/', views.HistorialComprasView.as_view(), name='historial'),
+    path('tienda/config/', views.tienda_config, name='tienda-config'),
+    path('suscripciones/', views.MisSuscripcionesView.as_view(), name='suscripciones'),
+    path('suscripciones/<int:pk>/cancelar/', views.cancelar_suscripcion, name='suscripcion-cancelar'),
 ]

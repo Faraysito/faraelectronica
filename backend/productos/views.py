@@ -1,26 +1,45 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Sum, Count
-from django.utils.timezone import now, timedelta
-from datetime import datetime
 import csv
+import uuid
+from collections import defaultdict
+from datetime import datetime
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.models import Sum, Count, Avg, F, Q
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import now, timedelta
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
+from rest_framework import viewsets, status, generics
+from rest_framework.decorators import action, api_view, permission_classes, throttle_classes
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.tokens import RefreshToken
+from transbank.common.integration_type import IntegrationType
+from transbank.common.options import WebpayOptions
+from transbank.webpay.webpay_plus.transaction import Transaction
+
+from . import meta_capi, precios
 from .models import (
     Producto, Orden, OrdenItem, Gasto, Venta, VentaItem, 
-    MetodoPago, Negocio, FacturaElectronica, PrecioEscalonado
+    MetodoPago, Negocio, FacturaElectronica, PrecioEscalonado, Resena, Suscripcion
 )
 from .serializers import (
-    ProductoSerializer, OrdenSerializer, GastoSerializer, 
-    VentaSerializer, FacturaSerializer, NegocioSerializer
+    ProductoSerializer, OrdenSerializer, OrdenClienteSerializer, GastoSerializer,
+    VentaSerializer, FacturaSerializer, NegocioSerializer, ResenaSerializer, SuscripcionSerializer
 )
+
+# estados en que la orden ya se pagó (sirven para "compra verificada")
+ESTADOS_PAGADOS = ('pagada', 'preparando', 'entregada')
 
 
 class NegocioViewSet(viewsets.ModelViewSet):
     """Multi-negocio: gestionar varios negocios por usuario."""
     serializer_class = NegocioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         return Negocio.objects.filter(owner=self.request.user)
@@ -30,47 +49,97 @@ class NegocioViewSet(viewsets.ModelViewSet):
 
 
 class ProductoViewSet(viewsets.ModelViewSet):
-    """Inventario: stock, categorías, SKU y precio por cantidad."""
+    """Inventario: stock, categorías, SKU y precio por cantidad.
+
+    Lectura pública (es el catálogo de la tienda); escritura solo admin.
+    """
     serializer_class = ProductoSerializer
-    permission_classes = [IsAuthenticated]
+    acciones_publicas = ('list', 'retrieve', 'por_categoria', 'precios_escalonados')
+
+    def get_permissions(self):
+        if self.action in self.acciones_publicas:
+            return [AllowAny()]
+        if self.action == 'resenas':
+            return [IsAuthenticated()] if self.request.method == 'POST' else [AllowAny()]
+        return [IsAdminUser()]
 
     def get_queryset(self):
+        qs = Producto.objects.all()
         negocio_id = self.request.query_params.get('negocio_id')
         if negocio_id:
-            return Producto.objects.filter(negocio_id=negocio_id)
-        return Producto.objects.all()
+            qs = qs.filter(negocio_id=negocio_id)
+        categoria = self.request.query_params.get('categoria')
+        if categoria:
+            qs = qs.filter(categoria__iexact=categoria)
+        return qs.annotate(
+            rating_avg=Avg('resenas__calificacion', filter=Q(resenas__visible=True)),
+            rating_count=Count('resenas', filter=Q(resenas__visible=True)),
+        ).prefetch_related('imagenes', 'precios_escalonados', 'complementos')
 
     @action(detail=False, methods=['get'])
     def por_categoria(self, request):
         """Listar productos por categoría."""
         categoria = request.query_params.get('categoria')
-        productos = Producto.objects.filter(categoria=categoria)
+        productos = self.get_queryset().filter(categoria=categoria)
         serializer = self.get_serializer(productos, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
-    def ajustar_stock(self, request):
+    def ajustar_stock(self, request, pk=None):
         """Ajustar stock manualmente."""
         producto = self.get_object()
-        cantidad = request.data.get('cantidad')
-        producto.stock = cantidad
+        try:
+            producto.stock = int(request.data.get('cantidad'))
+        except (TypeError, ValueError):
+            return Response({'error': 'cantidad inválida'}, status=400)
         producto.save()
         return Response({'stock': producto.stock})
 
     @action(detail=True, methods=['get'])
-    def precios_escalonados(self, request):
+    def precios_escalonados(self, request, pk=None):
         """Ver precios por cantidad."""
         producto = self.get_object()
-        precios = PrecioEscalonado.objects.filter(producto=producto)
+        precios_db = PrecioEscalonado.objects.filter(producto=producto)
         data = [{'min': p.cantidad_minima, 'max': p.cantidad_maxima, 'precio': p.precio} 
-                for p in precios]
+                for p in precios_db]
         return Response(data)
+
+    @action(detail=True, methods=['get', 'post'])
+    def resenas(self, request, pk=None):
+        """GET: reseñas visibles + resumen. POST: solo clientes con compra pagada del producto."""
+        producto = get_object_or_404(Producto, pk=pk)
+        if request.method == 'GET':
+            visibles = producto.resenas.filter(visible=True).select_related('usuario')
+            resumen = visibles.aggregate(promedio=Avg('calificacion'), total=Count('id'))
+            distribucion = {str(n): 0 for n in range(5, 0, -1)}
+            for fila in visibles.order_by().values('calificacion').annotate(c=Count('id')):
+                distribucion[str(fila['calificacion'])] = fila['c']
+            return Response({
+                'resumen': {
+                    'promedio': round(float(resumen['promedio']), 1) if resumen['promedio'] else None,
+                    'total': resumen['total'],
+                    'distribucion': distribucion,
+                },
+                'resenas': ResenaSerializer(visibles, many=True, context={'request': request}).data,
+            })
+
+        compro = OrdenItem.objects.filter(
+            producto=producto, orden__usuario=request.user, orden__estado__in=ESTADOS_PAGADOS,
+        ).exists()
+        if not compro:
+            return Response({'error': 'Solo pueden opinar clientes con una compra pagada de este producto.'}, status=403)
+        if Resena.objects.filter(producto=producto, usuario=request.user).exists():
+            return Response({'error': 'Ya dejaste una reseña para este producto.'}, status=400)
+        serializer = ResenaSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(producto=producto, usuario=request.user, compra_verificada=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrdenViewSet(viewsets.ModelViewSet):
     """Órdenes web y ventas presenciales."""
     serializer_class = OrdenSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         return Orden.objects.filter(usuario=self.request.user)
@@ -131,7 +200,7 @@ class OrdenViewSet(viewsets.ModelViewSet):
 class GastoViewSet(viewsets.ModelViewSet):
     """Libro de caja: gastos."""
     serializer_class = GastoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
         negocio_id = self.request.query_params.get('negocio_id')
@@ -201,7 +270,7 @@ class GastoViewSet(viewsets.ModelViewSet):
 class VentaViewSet(viewsets.ModelViewSet):
     """Ventas presenciales (POS)."""
     serializer_class = VentaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     @action(detail=False, methods=['post'])
     def crear_rapido(self, request):
@@ -242,7 +311,7 @@ class VentaViewSet(viewsets.ModelViewSet):
 
 class ReportesViewSet(viewsets.ViewSet):
     """Reportes descargables y estadísticas."""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     @action(detail=False, methods=['get'])
     def estadisticas(self, request):
@@ -336,7 +405,7 @@ class ReportesViewSet(viewsets.ViewSet):
 class FacturaViewSet(viewsets.ModelViewSet):
     """Boletas y facturas electrónicas (SII)."""
     serializer_class = FacturaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     @action(detail=False, methods=['post'])
     def generar_boleta(self, request):
@@ -378,95 +447,357 @@ class FacturaViewSet(viewsets.ModelViewSet):
         })
 
 
+# ── Estadísticas para el admin ─────────────────────────────────────
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
 def estadisticas(request):
-    """Estadísticas del dashboard del admin."""
-    negocio_id = request.query_params.get('negocio_id')
-    
-    # Misma lógica que en ReportesViewSet.estadisticas
-    ordenes = Orden.objects.filter(negocio_id=negocio_id) if negocio_id else Orden.objects.all()
-    ventas = Venta.objects.filter(negocio_id=negocio_id) if negocio_id else Venta.objects.all()
-    gastos = Gasto.objects.filter(negocio_id=negocio_id) if negocio_id else Gasto.objects.all()
-    
-    ingresos_web = ordenes.filter(estado='pagada').aggregate(Sum('total'))['total__sum'] or 0
-    ingresos_presencial = ventas.aggregate(Sum('total'))['total__sum'] or 0
-    
+    """
+    Devuelve métricas de ventas y rentabilidad. Solo para staff/admin.
+    Cuenta únicamente órdenes pagadas.
+    """
+    items_pagados = OrdenItem.objects.filter(orden__estado='pagada')
+
+    # Más y menos vendidos (por unidades)
+    ranking = (
+        items_pagados
+        .values('nombre_producto')
+        .annotate(unidades=Sum('cantidad'),
+                  ingresos=Sum(F('precio_unitario') * F('cantidad')))
+        .order_by('-unidades')
+    )
+    ranking = list(ranking)
+
+    ordenes_pagadas = Orden.objects.filter(estado='pagada')
+    ingresos_totales = ordenes_pagadas.aggregate(s=Sum('total'))['s'] or 0
+
+    # Utilidad total = ingresos - costos
+    costo_total = sum(
+        i['c'] for i in items_pagados.values('orden').annotate(
+            c=Sum(F('costo_unitario') * F('cantidad'))
+        )
+    ) if items_pagados.exists() else 0
+    utilidad_total = ingresos_totales - costo_total
+
+    margen_pct = round(utilidad_total / ingresos_totales * 100, 1) if ingresos_totales else 0
+
     return Response({
-        'ingresos_web': ingresos_web,
-        'ingresos_presencial': ingresos_presencial,
-        'ingresos_totales': ingresos_web + ingresos_presencial,
-        'egresos': gastos.aggregate(Sum('monto'))['monto__sum'] or 0,
-        'ganancia': (ordenes.filter(estado='pagada').aggregate(Sum('utilidad'))['utilidad__sum'] or 0) + 
-                   (ventas.aggregate(Sum('utilidad'))['utilidad__sum'] or 0),
+        'ordenes_pagadas': ordenes_pagadas.count(),
+        'ingresos_totales': ingresos_totales,
+        'costo_total': costo_total,
+        'utilidad_total': utilidad_total,
+        'margen_porcentaje': margen_pct,
+        'mas_vendidos': ranking[:5],
+        'menos_vendidos': ranking[-5:][::-1] if len(ranking) > 5 else [],
     })
 
 
-# Webpay (Transbank)
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
-from django.db.models import Sum, F
+# ── Config pública de la tienda ────────────────────────────────────
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def tienda_config(request):
+    """Lo que el front necesita para mostrar lo mismo que después cobra el backend."""
+    return Response({
+        'moneda': 'CLP',
+        'suscripcion': {
+            'descuento_pct': precios.descuento_suscripcion_pct(),
+            'frecuencias_dias': list(getattr(settings, 'SUSCRIPCION_FRECUENCIAS', [])),
+        },
+        'envio': {'gratis_desde': int(getattr(settings, 'ENVIO_GRATIS_DESDE', 0) or 0)},
+    })
 
+
+# ── Login con Google ───────────────────────────────────────────────
+@api_view(['POST'])
+@throttle_classes([AnonRateThrottle])
+def google_login(request):
+    token = request.data.get('token')
+
+    if not token:
+        return Response({'error': 'Token requerido'}, status=400)
+
+    try:
+        decoded = id_token.verify_oauth2_token(
+            token,
+            google_requests.Request(),
+            settings.GOOGLE_OAUTH2_CLIENT_ID
+        )
+
+        email = decoded.get('email')
+        name = decoded.get('name', email)
+        picture = decoded.get('picture')
+
+        if not email:
+            return Response({'error': 'Token inválido'}, status=400)
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={'username': email, 'first_name': name}
+        )
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'name': user.first_name,
+                'foto': picture,
+                'created': created
+            }
+        })
+    except ValueError:
+        return Response({'error': 'Token de Google inválido'}, status=401)
+    except Exception:
+        return Response({'error': 'Error de autenticación'}, status=400)
+
+
+# ── Webpay (Transbank) ─────────────────────────────────────────────
 def get_webpay_transaction():
-    """Simular instancia Webpay. En producción usar SDK real de Transbank."""
-    class MockWebpay:
-        def create(self, buy_order, session_id, amount, return_url):
-            return {'url': 'https://webpay.test.com', 'token': f'token_{buy_order}'}
-        def commit(self, token):
-            return {'status': 'AUTHORIZED', 'response_code': 0, 'authorization_code': '123456'}
-    return MockWebpay()
+    """
+    Devuelve una instancia de Transaction configurada.
+    - En integración (DEBUG=True): credenciales de prueba de Transbank.
+    - En producción (DEBUG=False): credenciales reales desde variables de entorno.
+    """
+    if settings.DEBUG:
+        return Transaction(WebpayOptions(
+            commerce_code='597055555532',
+            api_key='579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C',
+            integration_type=IntegrationType.TEST
+        ))
+    return Transaction(WebpayOptions(
+        commerce_code=settings.TBK_COMMERCE_CODE,
+        api_key=settings.TBK_API_KEY,
+        integration_type=IntegrationType.LIVE
+    ))
+
+
+def _es_true(valor):
+    return valor in (True, 1, '1', 'true', 'True', 'on')
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def webpay_crear(request):
-    """Crear pago Webpay. Genera token y retorna URL de redirección."""
+    """
+    Recibe el carrito [{id, cantidad, suscripcion?, frecuencia_dias?}, ...], valida contra la BD,
+    crea una Orden 'pendiente' y devuelve la URL + token de Webpay.
+    Combos y descuento de suscripción se calculan acá: nunca se confía en el precio del front.
+    """
+    items = request.data.get('items', [])
+    if not isinstance(items, list) or not items:
+        return Response({'error': 'El carrito está vacío'}, status=400)
+
+    pct_suscripcion = precios.descuento_suscripcion_pct()
+    frecuencias = list(getattr(settings, 'SUSCRIPCION_FRECUENCIAS', []))
+    pedido_por_producto = defaultdict(int)
+    lineas = []
+    total = 0
+    for item in items:
+        if not isinstance(item, dict):
+            return Response({'error': 'Item inválido'}, status=400)
+        try:
+            producto = Producto.objects.prefetch_related('precios_escalonados').get(id=item.get('id'))
+        except (Producto.DoesNotExist, ValueError, TypeError):
+            return Response({'error': f"Producto {item.get('id')} no existe"}, status=400)
+
+        try:
+            cantidad = int(item.get('cantidad', 1))
+        except (TypeError, ValueError):
+            return Response({'error': 'Cantidad inválida'}, status=400)
+        if cantidad < 1:
+            continue
+
+        es_suscripcion = _es_true(item.get('suscripcion'))
+        frecuencia = None
+        if es_suscripcion:
+            if not producto.permite_suscripcion or pct_suscripcion <= 0:
+                return Response({'error': f"{producto.nombre} no tiene suscripción disponible"}, status=400)
+            try:
+                frecuencia = int(item.get('frecuencia_dias') or (frecuencias[0] if frecuencias else 0))
+            except (TypeError, ValueError):
+                frecuencia = None
+            if frecuencia not in frecuencias:
+                return Response({'error': 'Frecuencia de suscripción inválida'}, status=400)
+
+        pedido_por_producto[producto.id] += cantidad
+        if producto.stock < pedido_por_producto[producto.id]:
+            return Response(
+                {'error': f"Stock insuficiente para {producto.nombre} (quedan {producto.stock})"},
+                status=400
+            )
+
+        unitario = precios.precio_unitario(producto, cantidad, suscripcion=es_suscripcion)
+        total += unitario * cantidad
+        lineas.append((producto, cantidad, unitario, es_suscripcion, frecuencia))
+
+    if total <= 0:
+        return Response({'error': 'Total inválido'}, status=400)
+
+    # buy_order: único, máx 26 caracteres para Webpay
+    buy_order = uuid.uuid4().hex[:26]
+    session_id = str(request.user.id)
+    umbral_envio = int(getattr(settings, 'ENVIO_GRATIS_DESDE', 0) or 0)
+
+    orden = Orden.objects.create(
+        usuario=request.user,
+        total=total,
+        estado='pendiente',
+        buy_order=buy_order,
+        envio_gratis=umbral_envio > 0 and total >= umbral_envio,
+    )
+    for producto, cantidad, unitario, es_suscripcion, frecuencia in lineas:
+        OrdenItem.objects.create(
+            orden=orden,
+            producto=producto,
+            nombre_producto=producto.nombre,
+            precio_unitario=unitario,
+            costo_unitario=producto.costo,
+            cantidad=cantidad,
+            es_suscripcion=es_suscripcion,
+            frecuencia_dias=frecuencia,
+        )
+
     try:
-        orden_id = request.data.get('orden_id')
-        orden = Orden.objects.get(id=orden_id, usuario=request.user)
-        
-        buy_order = f"ORD-{orden.id}-{now().timestamp()}"
-        orden.buy_order = buy_order
+        tx = get_webpay_transaction()
+        response = tx.create(buy_order, session_id, total, settings.WEBPAY_RETURN_URL)
+        orden.token_ws = response['token']
         orden.save()
-        
-        return Response({'mensaje': 'Orden creada. Webpay mock listo para integración real.'})
+        return Response({
+            'url': response['url'],
+            'token': response['token'],
+            'orden_id': orden.id,
+            'total': total,
+        })
     except Exception as e:
-        return Response({'error': str(e)}, status=500)
+        orden.estado = 'rechazada'
+        orden.save()
+        return Response({'error': f'Error al iniciar el pago: {str(e)}'}, status=500)
+
+
+def _items_orden(orden):
+    return [
+        {
+            'id': i.producto_id,
+            'nombre': i.nombre_producto,
+            'cantidad': i.cantidad,
+            'precio_unitario': i.precio_unitario,
+            'suscripcion': i.es_suscripcion,
+        }
+        for i in orden.items.all()
+    ]
+
+
+def _ip_cliente(request):
+    reenviada = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    return reenviada.split(',')[0].strip() if reenviada else request.META.get('REMOTE_ADDR')
+
+
+def _registrar_suscripciones(orden):
+    """Crea (o renueva) la suscripción de cada item pagado con suscripción."""
+    hoy = now().date()
+    pct = precios.descuento_suscripcion_pct()
+    for item in orden.items.filter(es_suscripcion=True).select_related('producto'):
+        if not item.producto:
+            continue
+        frecuencia = item.frecuencia_dias or 30
+        Suscripcion.objects.update_or_create(
+            usuario=orden.usuario,
+            producto=item.producto,
+            activa=True,
+            defaults={
+                'nombre_producto': item.nombre_producto,
+                'cantidad': item.cantidad,
+                'frecuencia_dias': frecuencia,
+                'descuento_pct': pct,
+                'proxima_fecha': hoy + timedelta(days=frecuencia),
+                'recordatorio_enviado_para': None,
+                'orden_origen': orden,
+            },
+        )
 
 
 @api_view(['POST', 'GET'])
 def webpay_confirmar(request):
-    """Confirmar pago Webpay."""
+    """
+    Webpay redirige al front con un token_ws y el front lo manda acá.
+    Confirmamos contra Transbank, actualizamos la orden, descontamos stock,
+    registramos suscripciones y avisamos la compra a Meta (CAPI).
+    """
     token = request.data.get('token_ws') or request.query_params.get('token_ws')
     if not token:
         return Response({'error': 'Token no recibido'}, status=400)
 
     try:
         orden = Orden.objects.get(token_ws=token)
-        orden.estado = 'pagada'
-        orden.save()
-        
-        # Descontar stock
-        for item in orden.items.all():
-            if item.producto:
-                item.producto.stock = max(0, item.producto.stock - item.cantidad)
-                item.producto.save()
-        
-        return Response({'estado': 'pagada', 'orden_id': orden.id})
+    except Orden.DoesNotExist:
+        return Response({'error': 'Orden no encontrada'}, status=404)
+
+    # idempotente: si recargan /pago/retorno no se confirma ni se descuenta stock 2 veces
+    if orden.estado == 'pagada':
+        return Response({'estado': 'pagada', 'orden_id': orden.id, 'total': orden.total, 'items': _items_orden(orden)})
+    if orden.estado == 'rechazada':
+        return Response({'estado': 'rechazada', 'orden_id': orden.id})
+
+    try:
+        tx = get_webpay_transaction()
+        result = tx.commit(token)
+
+        aprobada = result.get('status') == 'AUTHORIZED' and result.get('response_code') == 0
+        if not aprobada:
+            orden.estado = 'rechazada'
+            orden.save()
+            return Response({'estado': 'rechazada', 'orden_id': orden.id})
+
+        with transaction.atomic():
+            orden.estado = 'pagada'
+            orden.authorization_code = result.get('authorization_code', '')
+            orden.payment_type_code = result.get('payment_type_code', '')
+            orden.save()
+            # Descontar stock ahora que el pago está confirmado
+            for item in orden.items.select_related('producto'):
+                if item.producto:
+                    item.producto.stock = max(0, item.producto.stock - item.cantidad)
+                    item.producto.save()
+            _registrar_suscripciones(orden)
     except Exception as e:
-        return Response({'error': str(e)}, status=500)
+        return Response({'error': f'Error al confirmar el pago: {str(e)}'}, status=500)
+
+    meta_capi.enviar_purchase(
+        orden,
+        ip=_ip_cliente(request),
+        user_agent=request.META.get('HTTP_USER_AGENT'),
+        fbp=request.data.get('fbp'),
+        fbc=request.data.get('fbc'),
+    )
+    return Response({'estado': 'pagada', 'orden_id': orden.id, 'total': orden.total, 'items': _items_orden(orden)})
 
 
+# ── Cliente ────────────────────────────────────────────────────────
 class HistorialComprasView(generics.ListAPIView):
     """Historial de compras del usuario logueado."""
-    serializer_class = OrdenSerializer
+    serializer_class = OrdenClienteSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        # Solo las órdenes del usuario logueado, y solo las que avanzaron de 'pendiente'.
         return Orden.objects.filter(usuario=self.request.user).exclude(estado='pendiente')
 
 
-@api_view(['GET'])
-@permission_classes([IsAdminUser])
-def google_login(request):
-    """Placeholder para Google OAuth. Implementar en frontend."""
-    return Response({'mensaje': 'Google login endpoint. Configurar en frontend.'})
+class MisSuscripcionesView(generics.ListAPIView):
+    """Suscripciones activas del usuario logueado."""
+    serializer_class = SuscripcionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Suscripcion.objects.filter(usuario=self.request.user, activa=True)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cancelar_suscripcion(request, pk):
+    suscripcion = get_object_or_404(Suscripcion, pk=pk, usuario=request.user)
+    suscripcion.activa = False
+    suscripcion.save()
+    return Response(SuscripcionSerializer(suscripcion).data)

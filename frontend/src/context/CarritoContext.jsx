@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { totalLinea } from "../lib/precios";
+import { claveLinea } from "../lib/carrito";
 
 const CarritoContext = createContext();
 
@@ -18,33 +20,45 @@ export function CarritoProvider({ children }) {
     localStorage.setItem("carrito", JSON.stringify(carrito));
   }, [carrito]);
 
-  const agregarAlCarrito = (producto) => {
+  // opciones: { suscripcion, frecuencia_dias } -> va en una línea aparte de la compra única
+  const agregarAlCarrito = (producto, cantidad = 1, opciones = {}) => {
+    const suscripcion = !!opciones.suscripcion;
+    const frecuencia_dias = suscripcion ? opciones.frecuencia_dias : null;
+    const linea = suscripcion
+      ? `${producto.id}-s${frecuencia_dias}`
+      : String(producto.id);
     setCarrito((prev) => {
-      const existe = prev.find((p) => p.id === producto.id);
+      const existe = prev.find((p) => claveLinea(p) === linea);
       if (existe)
         return prev.map((p) =>
-          p.id === producto.id ? { ...p, cantidad: p.cantidad + 1 } : p,
+          claveLinea(p) === linea
+            ? { ...p, cantidad: p.cantidad + cantidad }
+            : p,
         );
-      return [...prev, { ...producto, cantidad: 1 }];
+      return [
+        ...prev,
+        { ...producto, cantidad, linea, suscripcion, frecuencia_dias },
+      ];
     });
   };
 
-  const quitarDelCarrito = (id) =>
-    setCarrito((prev) => prev.filter((p) => p.id !== id));
+  // reciben la clave de la línea (para compras únicas es el id del producto)
+  const quitarDelCarrito = (linea) =>
+    setCarrito((prev) => prev.filter((p) => claveLinea(p) !== String(linea)));
 
-  const cambiarCantidad = (id, cantidad) => {
-    if (cantidad < 1) return quitarDelCarrito(id);
+  const cambiarCantidad = (linea, cantidad) => {
+    if (cantidad < 1) return quitarDelCarrito(linea);
     setCarrito((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, cantidad } : p)),
+      prev.map((p) =>
+        claveLinea(p) === String(linea) ? { ...p, cantidad } : p,
+      ),
     );
   };
 
   const vaciarCarrito = () => setCarrito([]);
 
-  const total = carrito.reduce(
-    (acc, p) => acc + (p.precio || 0) * p.cantidad,
-    0,
-  );
+  // combos y suscripción incluidos (el backend recalcula igual al pagar)
+  const total = carrito.reduce((acc, p) => acc + totalLinea(p), 0);
   const cantidadTotal = carrito.reduce((acc, p) => acc + p.cantidad, 0);
 
   return (

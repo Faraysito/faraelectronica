@@ -16,6 +16,17 @@ Tienda online de **cámaras de seguridad y equipos de calefacción** para una py
 - **Compra alternativa por WhatsApp** directo con el vendedor.
 - **Panel de administración** con tema propio y **dashboard de estadísticas** (ingresos, utilidad, margen %, ranking de productos) con gráficos.
 - **Responsive** y con modo claro/oscuro.
+- **Página de producto** (`/producto/:id`) pensada para convertir: titular con el resultado, estrellas y reseñas de compradores verificados (con fotos), combos x1/x2/x3, suscríbete y ahorra, precio por día, garantía legal, especificaciones, sellos, tabla comparativa, timeline, FAQ, disclaimer y botón de compra fijo.
+- **Carrito** con barra de envío gratis, upsell de complementos y pago express directo a Webpay.
+- **Marketing**: pop-up de email a Klaviyo, Meta Pixel + Conversions API (Purchase deduplicado) y variantes A/B.
+
+## Página de producto: qué se edita dónde
+
+- **Copys, toggles por sección y variantes A/B**: `frontend/src/config/tienda.js`. Para ver una variante: `?ab_titular=b` o `?ab_cta=b`.
+- **Por producto (admin de Django)**: titular, especificaciones, modo de uso, ficha técnica, certificaciones, si admite suscripción, complementos (upsell) y combos (precios escalonados).
+- **Precios y reglas (backend `.env`)**: `COMBO_DESCUENTOS`, `SUSCRIPCION_DESCUENTO_PCT`, `SUSCRIPCION_FRECUENCIAS`, `ENVIO_GRATIS_DESDE`. El front los lee de `/api/tienda/config/` y el backend cobra lo mismo.
+- **Integraciones**: `VITE_META_PIXEL_ID`, `VITE_KLAVIYO_PUBLIC_KEY`, `VITE_KLAVIYO_LIST_ID` (front) y `META_PIXEL_ID`, `META_CAPI_TOKEN`, `KLAVIYO_PRIVATE_KEY`, `FRONTEND_URL` (backend). Vacías = apagadas.
+- **Suscripciones**: no hay cobro automático. Correr una vez al día `python manage.py recordatorios_suscripcion` (Cron Job de Render) para mandar a Klaviyo el evento del recordatorio de recompra; el correo se arma con un flow en Klaviyo.
 
 ## Stack
 
@@ -68,6 +79,9 @@ App en `http://localhost:5173`
 ```bash
 cd backend
 python manage.py test productos
+
+cd frontend
+npm test
 ```
 
 Cubre la lógica de negocio (margen, utilidad, stock), la **seguridad de pagos** (recálculo de precio en servidor, validación de stock) y el aislamiento del historial por usuario.

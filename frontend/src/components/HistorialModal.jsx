@@ -8,6 +8,37 @@ function HistorialModal({ onClose }) {
   const [ordenes, setOrdenes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [suscripciones, setSuscripciones] = useState([]);
+
+  // suscripciones activas (se cancelan desde acá, sin cobros pendientes)
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    let activo = true;
+    fetch(`${API_URL}/api/suscripciones/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (activo && Array.isArray(data)) setSuscripciones(data);
+      })
+      .catch(() => {});
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  const cancelarSuscripcion = async (id) => {
+    const token = localStorage.getItem("access_token");
+    try {
+      const res = await fetch(`${API_URL}/api/suscripciones/${id}/cancelar/`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setSuscripciones((prev) => prev.filter((s) => s.id !== id));
+    } catch {
+      // si falla se puede volver a intentar
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -78,6 +109,12 @@ function HistorialModal({ onClose }) {
         .hist-vacio-icon { font-size: 3rem; margin-bottom: 12px; }
         .btn-cerrar-hist { width: 100%; padding: 13px; background: transparent; border: 1px solid #333; color: #888; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; }
         .btn-cerrar-hist:hover { border-color: #555; color: #aaa; }
+        .hist-subs { background: #0d0d0d; border: 1px solid #2a2a00; border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+        .hist-subs-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: 0.06em; color: #f5c800; margin: 0; }
+        .hist-sub { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: #ddd; }
+        .hist-sub span { display: block; color: #888; font-size: 0.74rem; margin-top: 2px; }
+        .hist-sub-cancelar { flex-shrink: 0; background: transparent; border: 1px solid #444; color: #aaa; border-radius: 20px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; cursor: pointer; }
+        .hist-sub-cancelar:hover { border-color: #ff6b6b; color: #ff6b6b; }
       `}</style>
 
       <div className="hist-box" onClick={(e) => e.stopPropagation()}>
@@ -86,6 +123,29 @@ function HistorialModal({ onClose }) {
         </h2>
 
         <div className="hist-lista">
+          {suscripciones.length > 0 && (
+            <div className="hist-subs">
+              <p className="hist-subs-titulo">Mis suscripciones</p>
+              {suscripciones.map((s) => (
+                <div className="hist-sub" key={s.id}>
+                  <div>
+                    <strong>{s.nombre_producto}</strong> x{s.cantidad}
+                    <span>
+                      Cada {s.frecuencia_dias} días · {s.descuento_pct}% de
+                      descuento · próximo pedido:{" "}
+                      {fecha(`${s.proxima_fecha}T12:00:00`)}
+                    </span>
+                  </div>
+                  <button
+                    className="hist-sub-cancelar"
+                    onClick={() => cancelarSuscripcion(s.id)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           {loading && <div className="hist-vacio">Cargando...</div>}
           {error && <div className="hist-vacio">{error}</div>}
           {!loading && !error && ordenes.length === 0 && (
@@ -113,6 +173,7 @@ function HistorialModal({ onClose }) {
                   <div key={i}>
                     {it.nombre_producto} x{it.cantidad} — $
                     {it.subtotal.toLocaleString("es-CL")}
+                    {it.es_suscripcion && " (suscripción)"}
                   </div>
                 ))}
               </div>

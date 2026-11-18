@@ -8,9 +8,13 @@ import Camaras from "./pages/Camaras";
 import Calefaccion from "./pages/Calefaccion";
 import PagoRetorno from "./pages/PagoRetorno";
 import NoEncontrado from "./pages/NoEncontrado";
+import PopupEmail from "./components/PopupEmail";
+import RastreoPixel from "./components/RastreoPixel";
 import { useTema } from "./context/ThemeContext";
 
 const AdminStats = lazy(() => import("./pages/AdminStats"));
+// la página de producto va en su propio chunk (como AdminStats)
+const Producto = lazy(() => import("./pages/Producto"));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -48,6 +52,14 @@ function AnimatedRoutes() {
         <Route path="/" element={wrap(<Home />)} />
         <Route path="/camaras" element={wrap(<Camaras />)} />
         <Route path="/calefaccion" element={wrap(<Calefaccion />)} />
+        <Route
+          path="/producto/:id"
+          element={wrap(
+            <Suspense fallback={<div style={{ minHeight: "60vh" }} />}>
+              <Producto />
+            </Suspense>,
+          )}
+        />
         <Route path="/pago/retorno" element={wrap(<PagoRetorno />)} />
         <Route
           path="/admin/stats"
@@ -68,9 +80,11 @@ function App() {
 
   return (
     <BrowserRouter>
+      <RastreoPixel />
       <Navbar />
       <AnimatedRoutes />
       <Footer />
+      <PopupEmail />
       <button
         className="theme-toggle"
         onClick={toggleTema}
